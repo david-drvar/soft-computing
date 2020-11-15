@@ -58,6 +58,14 @@ def resize_region(region):
     return cv2.resize(region, (28, 28), interpolation=cv2.INTER_NEAREST)
 
 
+def isAlreadyAdded(regions_array_filtered, x):
+    for region in regions_array_filtered:
+        if region[1][0] == x:
+            return True
+
+    return False
+
+
 def select_roi(image_orig, image_bin):
     '''Oznaciti regione od interesa na originalnoj slici. (ROI = regions of interest)
         Za svaki region napraviti posebnu sliku dimenzija 28 x 28.
@@ -80,7 +88,9 @@ def select_roi(image_orig, image_bin):
 
     # sortirati sve regione po x osi (sa leva na desno) i smestiti u promenljivu sorted_regions
     regions_array = sorted(regions_array, key=lambda item: item[1][0])
-    sorted_regions = [region[0] for region in regions_array]
+
+
+    regions_array_filtered = []
 
     for region in regions_array:
         x1 = region[1][0]
@@ -94,27 +104,31 @@ def select_roi(image_orig, image_bin):
             w2 = smaller_region[1][2]
             h2 = smaller_region[1][3]
             if x2 > x1 and x2 + w2 < x1 + w1:
+                found = True
                 x = x1
                 y = y2
                 w = w1
                 h = h1 + h2
-                # region = image_bin[y:y + h + 1, x:x + w + 1]
-                # regions_array.append([resize_region(region), (x, y, w, h)])
-                cv2.rectangle(image_orig, (x, y), (x + w, y + h), (255, 0, 0), 2)
-                found = True
-                display_image(image_orig)
+                if not isAlreadyAdded(regions_array_filtered, x):
+                    cutout = image_bin[y:y + h + 1, x:x + w + 1]
+                    regions_array_filtered.append([resize_region(cutout), (x, y, w, h)])
+                    cv2.rectangle(image_orig, (x, y), (x + w, y + h), (255, 0, 0), 2)
             elif x2 < x1 and x2 + w2 > x1 + w1:
+                found = True
                 x = x2
                 y = y1
                 w = w2
                 h = h1 + h2
-                # region = image_bin[y:y + h + 1, x:x + w + 1]
-                # regions_array.append([resize_region(region), (x, y, w, h)])
-                found = True
-                cv2.rectangle(image_orig, (x, y), (x + w, y + h), (255, 0, 0), 2)
-                display_image(image_orig)
+                if not isAlreadyAdded(regions_array_filtered,x):
+                    cutout = image_bin[y:y + h + 1, x:x + w + 1]
+                    regions_array_filtered.append([resize_region(cutout), (x, y, w, h)])
+                    cv2.rectangle(image_orig, (x, y), (x + w, y + h), (255, 0, 0), 2)
         if not found:
+            cutout = image_bin[y1:y1 + h1 + 1, x1:x1 + w1 + 1]
+            regions_array_filtered.append([resize_region(cutout), (x1, y1, w1, h1)])
             cv2.rectangle(image_orig, (x1, y1), (x1 + w1, y1 + h1), (0, 255, 0), 2)
+
+    sorted_regions = [region[0] for region in regions_array_filtered]
 
     return image_orig, sorted_regions
 
