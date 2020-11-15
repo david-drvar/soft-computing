@@ -7,41 +7,55 @@ import collections
 
 # keras
 from keras.models import Sequential
-from keras.layers.core import Dense,Activation
+from keras.layers.core import Dense, Activation
 from keras.optimizers import SGD
 
 import matplotlib.pylab as pylab
 
+
 def load_image(path):
     return cv2.cvtColor(cv2.imread(path), cv2.COLOR_BGR2RGB)
+
+
 def image_gray(image):
     return cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+
+
 def image_bin(image_gs):
     height, width = image_gs.shape[0:2]
     image_binary = np.ndarray((height, width), dtype=np.uint8)
-    ret,image_bin = cv2.threshold(image_gs, 200, 255, cv2.THRESH_BINARY)
+    ret, image_bin = cv2.threshold(image_gs, 200, 255, cv2.THRESH_BINARY)
     display_image(image_bin)
-    #image_bin = cv2.adaptiveThreshold(image_gs, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
+    # image_bin = cv2.adaptiveThreshold(image_gs, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
     return image_bin
+
+
 def invert(image):
-    return 255-image
-def display_image(image, color= False):
+    return 255 - image
+
+
+def display_image(image, color=False):
     if color:
         plt.imshow(image)
         plt.show()
     else:
         plt.imshow(image, 'gray')
         plt.show()
+
+
 def dilate(image):
-    kernel = np.ones((3,3)) # strukturni element 3x3 blok
+    kernel = np.ones((3, 3))  # strukturni element 3x3 blok
     return cv2.dilate(image, kernel, iterations=1)
+
+
 def erode(image):
-    kernel = np.ones((3,3)) # strukturni element 3x3 blok
+    kernel = np.ones((3, 3))  # strukturni element 3x3 blok
     return cv2.erode(image, kernel, iterations=1)
+
 
 def resize_region(region):
     '''Transformisati selektovani region na sliku dimenzija 28x28'''
-    return cv2.resize(region,(28,28), interpolation = cv2.INTER_NEAREST)
+    return cv2.resize(region, (28, 28), interpolation=cv2.INTER_NEAREST)
 
 
 def select_roi(image_orig, image_bin):
@@ -57,24 +71,60 @@ def select_roi(image_orig, image_bin):
     for i in range(len(contours)):
         x, y, w, h = cv2.boundingRect(contours[i])  # koordinate i velicina granicnog pravougaonika
         area = cv2.contourArea(contours[i])
-        if h > 10 and w > 10 and hierarchy[0,i,3] == -1:
+        if h > 10 and w > 10 and hierarchy[0, i, 3] == -1:
             # kopirati [y:y+h+1, x:x+w+1] sa binarne slike i smestiti u novu sliku
             # označiti region pravougaonikom na originalnoj slici (image_orig) sa rectangle funkcijom
             region = image_bin[y:y + h + 1, x:x + w + 1]
             regions_array.append([resize_region(region), (x, y, w, h)])
-            cv2.rectangle(image_orig, (x, y), (x + w, y + h), (0, 255, 0), 2)
+            # cv2.rectangle(image_orig, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
     # sortirati sve regione po x osi (sa leva na desno) i smestiti u promenljivu sorted_regions
     regions_array = sorted(regions_array, key=lambda item: item[1][0])
     sorted_regions = [region[0] for region in regions_array]
 
+    for region in regions_array:
+        x1 = region[1][0]
+        y1 = region[1][1]
+        w1 = region[1][2]
+        h1 = region[1][3]
+        found = False
+        for smaller_region in regions_array:
+            x2 = smaller_region[1][0]
+            y2 = smaller_region[1][1]
+            w2 = smaller_region[1][2]
+            h2 = smaller_region[1][3]
+            if x2 > x1 and x2 + w2 < x1 + w1:
+                x = x1
+                y = y2
+                w = w1
+                h = h1 + h2
+                # region = image_bin[y:y + h + 1, x:x + w + 1]
+                # regions_array.append([resize_region(region), (x, y, w, h)])
+                cv2.rectangle(image_orig, (x, y), (x + w, y + h), (255, 0, 0), 2)
+                found = True
+                display_image(image_orig)
+            elif x2 < x1 and x2 + w2 > x1 + w1:
+                x = x2
+                y = y1
+                w = w2
+                h = h1 + h2
+                # region = image_bin[y:y + h + 1, x:x + w + 1]
+                # regions_array.append([resize_region(region), (x, y, w, h)])
+                found = True
+                cv2.rectangle(image_orig, (x, y), (x + w, y + h), (255, 0, 0), 2)
+                display_image(image_orig)
+        if not found:
+            cv2.rectangle(image_orig, (x1, y1), (x1 + w1, y1 + h1), (0, 255, 0), 2)
+
     return image_orig, sorted_regions
 
-def scale_to_range(image): # skalira elemente slike na opseg od 0 do 1
+
+def scale_to_range(image):  # skalira elemente slike na opseg od 0 do 1
     ''' Elementi matrice image su vrednosti 0 ili 255.
         Potrebno je skalirati sve elemente matrica na opseg od 0 do 1
     '''
-    return image/255
+    return image / 255
+
 
 def matrix_to_vector(image):
     '''Sliku koja je zapravo matrica 28x28 transformisati u vektor sa 784 elementa'''
@@ -93,6 +143,7 @@ def prepare_for_ann(regions):
         ready_for_ann.append(matrix_to_vector(scale))
 
     return ready_for_ann
+
 
 def convert_output(alphabet):
     '''Konvertovati alfabet u niz pogodan za obučavanje NM,
@@ -118,6 +169,7 @@ def create_ann():
     ann.add(Dense(10, activation='sigmoid'))
     return ann
 
+
 def train_or_load_character_recognition_model(train_image_paths, serialization_folder):
     """
     Procedura prima putanje do fotografija za obucavanje (dataset se sastoji iz razlicitih fotografija alfabeta), kao i
@@ -134,7 +186,6 @@ def train_or_load_character_recognition_model(train_image_paths, serialization_f
     """
     # TODO - Istrenirati model ako vec nije istreniran, ili ga samo ucitati iz foldera za serijalizaciju
 
-
     for image in train_image_paths:
         image_color = load_image(image)
         display_image(image_color)
@@ -145,11 +196,8 @@ def train_or_load_character_recognition_model(train_image_paths, serialization_f
         selected_regions, numbers = select_roi(image_color.copy(), img)
         display_image(selected_regions)
 
-
     model = None
     return model
-
-
 
 
 def extract_text_from_image(trained_model, image_path, vocabulary):
