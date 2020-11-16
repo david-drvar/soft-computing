@@ -105,9 +105,9 @@ def select_roi(image_orig, image_bin):
             if x2 > x1 and x2 + w2 < x1 + w1:
                 found = True
                 x = x1
-                y = y2 -10
+                y = y2 - 10
                 w = w1
-                h = h1 + h2 +20
+                h = h1 + h2 + 20
                 if not isAlreadyAdded(regions_array_filtered, x):
                     cutout = image_bin[y:y + h + 1, x:x + w + 1]
                     regions_array_filtered.append([resize_region(cutout), (x, y, w, h)])
@@ -115,9 +115,9 @@ def select_roi(image_orig, image_bin):
             elif x2 < x1 and x2 + w2 > x1 + w1:
                 found = True
                 x = x2
-                y = y1-10
+                y = y1 - 10
                 w = w2
-                h = h1 + h2+20
+                h = h1 + h2 + 20
                 if not isAlreadyAdded(regions_array_filtered, x):
                     cutout = image_bin[y:y + h + 1, x:x + w + 1]
                     regions_array_filtered.append([resize_region(cutout), (x, y, w, h)])
@@ -140,7 +140,7 @@ def select_roi(image_orig, image_bin):
             #         cutout = image_bin[y:y + h + 1, x:x + w + 1]
             #         regions_array_filtered.append([resize_region(cutout), (x, y, w, h)])
             #         cv2.rectangle(image_orig, (x, y), (x + w, y + h), (0, 0, 0), 2)
-        if not found and w1 >20:
+        if not found and w1 > 20:
             cutout = image_bin[y1:y1 + h1 + 1, x1:x1 + w1 + 1]
             regions_array_filtered.append([resize_region(cutout), (x1, y1, w1, h1)])
             cv2.rectangle(image_orig, (x1, y1), (x1 + w1, y1 + h1), (0, 255, 0), 2)
@@ -197,7 +197,7 @@ def create_ann():
     '''
     ann = Sequential()
     ann.add(Dense(128, input_dim=784, activation='sigmoid'))
-    ann.add(Dense(30, activation='sigmoid'))
+    ann.add(Dense(60, activation='sigmoid'))
     return ann
 
 
@@ -215,9 +215,11 @@ def train_ann(ann, X_train, y_train):
 
     return ann
 
-def winner(output): # output je vektor sa izlaza neuronske mreze
+
+def winner(output):  # output je vektor sa izlaza neuronske mreze
     """pronaći i vratiti indeks neurona koji je najviše pobuđen"""
     return max(enumerate(output), key=lambda x: x[1])[0]
+
 
 def display_result(outputs, alphabet):
     '''za svaki rezultat pronaći indeks pobedničkog
@@ -227,6 +229,7 @@ def display_result(outputs, alphabet):
     for output in outputs:
         result.append(alphabet[winner(output)])
     return result
+
 
 def train_or_load_character_recognition_model(train_image_paths, serialization_folder):
     """
@@ -245,6 +248,11 @@ def train_or_load_character_recognition_model(train_image_paths, serialization_f
     # TODO - Istrenirati model ako vec nije istreniran, ili ga samo ucitati iz foldera za serijalizaciju
     ann = create_ann()
 
+    inputs = []
+    alphabet = ['A', 'B', 'C', 'Č', 'Ć', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q',
+                'R', 'S', 'Š', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'Ž', 'a', 'b', 'c', 'č', 'ć', 'd', 'e',
+                'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q',
+                'r', 's', 'š', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'ž']
     for i in range(len(train_image_paths)):
         image_color = load_image(train_image_paths[i])
         display_image(image_color)
@@ -260,14 +268,19 @@ def train_or_load_character_recognition_model(train_image_paths, serialization_f
         # else:
         #     alphabet = ['a', 'b', 'c', 'č', 'ć', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q',
         #                 'r', 's', 'š', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'ž']
-        #
-        # inputs = prepare_for_ann(numbers)
-        # outputs = convert_output(alphabet)
-        #
-        # ann = train_ann(ann, inputs, outputs)
+        for result in prepare_for_ann(numbers):
+            inputs.append(result)
+        # inputs.append(prepare_for_ann(numbers))
+
+    outputs = convert_output(alphabet)
+    ann = train_ann(ann, inputs, outputs)
 
     # model = None
     # return model
+
+    result = ann.predict(np.array(inputs[2:4], np.float32))
+    print(result)
+    print(display_result(result, alphabet))
 
     return ann
 
