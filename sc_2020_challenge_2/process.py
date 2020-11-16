@@ -89,7 +89,6 @@ def select_roi(image_orig, image_bin):
     # sortirati sve regione po x osi (sa leva na desno) i smestiti u promenljivu sorted_regions
     regions_array = sorted(regions_array, key=lambda item: item[1][0])
 
-
     regions_array_filtered = []
 
     for region in regions_array:
@@ -106,9 +105,9 @@ def select_roi(image_orig, image_bin):
             if x2 > x1 and x2 + w2 < x1 + w1:
                 found = True
                 x = x1
-                y = y2
+                y = y2 -10
                 w = w1
-                h = h1 + h2
+                h = h1 + h2 +20
                 if not isAlreadyAdded(regions_array_filtered, x):
                     cutout = image_bin[y:y + h + 1, x:x + w + 1]
                     regions_array_filtered.append([resize_region(cutout), (x, y, w, h)])
@@ -116,14 +115,32 @@ def select_roi(image_orig, image_bin):
             elif x2 < x1 and x2 + w2 > x1 + w1:
                 found = True
                 x = x2
-                y = y1
+                y = y1-10
                 w = w2
-                h = h1 + h2
-                if not isAlreadyAdded(regions_array_filtered,x):
+                h = h1 + h2+20
+                if not isAlreadyAdded(regions_array_filtered, x):
                     cutout = image_bin[y:y + h + 1, x:x + w + 1]
                     regions_array_filtered.append([resize_region(cutout), (x, y, w, h)])
                     cv2.rectangle(image_orig, (x, y), (x + w, y + h), (255, 0, 0), 2)
-        if not found:
+            # elif x1 < x2 < x1+w1:
+            #     x = x1
+            #     y= y2-10
+            #     w = 2*w2 - w1
+            #     h = h1 + h2+20
+            #     if not isAlreadyAdded(regions_array_filtered, x):
+            #         cutout = image_bin[y:y + h + 1, x:x + w + 1]
+            #         regions_array_filtered.append([resize_region(cutout), (x, y, w, h)])
+            #         cv2.rectangle(image_orig, (x, y), (x + w, y + h), (0, 0, 0), 2)
+            # elif x2 < x1 <x2+w2:
+            #     x = x2
+            #     y= y1-10
+            #     w = 2*w1 - w2
+            #     h = h1 + h2 + 20
+            #     if not isAlreadyAdded(regions_array_filtered, x):
+            #         cutout = image_bin[y:y + h + 1, x:x + w + 1]
+            #         regions_array_filtered.append([resize_region(cutout), (x, y, w, h)])
+            #         cv2.rectangle(image_orig, (x, y), (x + w, y + h), (0, 0, 0), 2)
+        if not found and w1 >20:
             cutout = image_bin[y1:y1 + h1 + 1, x1:x1 + w1 + 1]
             regions_array_filtered.append([resize_region(cutout), (x1, y1, w1, h1)])
             cv2.rectangle(image_orig, (x1, y1), (x1 + w1, y1 + h1), (0, 255, 0), 2)
@@ -180,9 +197,36 @@ def create_ann():
     '''
     ann = Sequential()
     ann.add(Dense(128, input_dim=784, activation='sigmoid'))
-    ann.add(Dense(10, activation='sigmoid'))
+    ann.add(Dense(30, activation='sigmoid'))
     return ann
 
+
+def train_ann(ann, X_train, y_train):
+    '''Obucavanje vestacke neuronske mreze'''
+    X_train = np.array(X_train, np.float32)  # dati ulazi
+    y_train = np.array(y_train, np.float32)  # zeljeni izlazi za date ulaze
+
+    # definisanje parametra algoritma za obucavanje
+    sgd = SGD(lr=0.01, momentum=0.9)
+    ann.compile(loss='mean_squared_error', optimizer=sgd)
+
+    # obucavanje neuronske mreze
+    ann.fit(X_train, y_train, epochs=500, batch_size=1, verbose=0, shuffle=False)
+
+    return ann
+
+def winner(output): # output je vektor sa izlaza neuronske mreze
+    """pronaći i vratiti indeks neurona koji je najviše pobuđen"""
+    return max(enumerate(output), key=lambda x: x[1])[0]
+
+def display_result(outputs, alphabet):
+    '''za svaki rezultat pronaći indeks pobedničkog
+        regiona koji ujedno predstavlja i indeks u alfabetu.
+        Dodati karakter iz alfabet u result'''
+    result = []
+    for output in outputs:
+        result.append(alphabet[winner(output)])
+    return result
 
 def train_or_load_character_recognition_model(train_image_paths, serialization_folder):
     """
@@ -199,9 +243,10 @@ def train_or_load_character_recognition_model(train_image_paths, serialization_f
     :return: Objekat modela
     """
     # TODO - Istrenirati model ako vec nije istreniran, ili ga samo ucitati iz foldera za serijalizaciju
+    ann = create_ann()
 
-    for image in train_image_paths:
-        image_color = load_image(image)
+    for i in range(len(train_image_paths)):
+        image_color = load_image(train_image_paths[i])
         display_image(image_color)
         img = invert(image_bin(image_gray(image_color)))
         display_image(img)
@@ -209,9 +254,22 @@ def train_or_load_character_recognition_model(train_image_paths, serialization_f
         display_image(img_bin)
         selected_regions, numbers = select_roi(image_color.copy(), img)
         display_image(selected_regions)
+        # if i == 0:
+        #     alphabet = ['A', 'B', 'C', 'Č', 'Ć', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q',
+        #                 'R','S', 'Š', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'Ž']
+        # else:
+        #     alphabet = ['a', 'b', 'c', 'č', 'ć', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q',
+        #                 'r', 's', 'š', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'ž']
+        #
+        # inputs = prepare_for_ann(numbers)
+        # outputs = convert_output(alphabet)
+        #
+        # ann = train_ann(ann, inputs, outputs)
 
-    model = None
-    return model
+    # model = None
+    # return model
+
+    return ann
 
 
 def extract_text_from_image(trained_model, image_path, vocabulary):
