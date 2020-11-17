@@ -6,13 +6,11 @@ import matplotlib.pyplot as plt
 import collections
 
 # keras
-import tensorflow as tf
 from keras.models import Sequential
 from keras.layers.core import Dense, Activation
 from keras.optimizers import SGD
 from keras.models import model_from_json
 from keras.models import load_model
-from tensorflow import keras
 
 #Sklearn biblioteka sa implementiranim K-means algoritmom
 from sklearn import datasets
@@ -361,7 +359,7 @@ def train_or_load_character_recognition_model(train_image_paths, serialization_f
     print(result)
     print(display_result(result, alphabet))
 
-    result = ann.predict(np.array(inputs[1:60], np.float32))
+    result = ann.predict(np.array(inputs[0:60], np.float32))
     print(result)
     print(display_result(result, alphabet))
 
