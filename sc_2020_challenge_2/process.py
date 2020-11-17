@@ -14,6 +14,9 @@ from keras.models import model_from_json
 from keras.models import load_model
 from tensorflow import keras
 
+#Sklearn biblioteka sa implementiranim K-means algoritmom
+from sklearn import datasets
+from sklearn.cluster import KMeans
 
 import matplotlib.pylab as pylab
 
@@ -153,7 +156,17 @@ def select_roi(image_orig, image_bin):
 
     sorted_regions = [region[0] for region in regions_array_filtered]
 
-    return image_orig, sorted_regions
+    sorted_rectangles = [region[1] for region in regions_array_filtered]
+    region_distances = []
+    # Izdvojiti sortirane parametre opisujućih pravougaonika
+    # Izračunati rastojanja između svih susednih regiona po x osi i dodati ih u region_distances niz
+    for index in range(0, len(sorted_rectangles)-1):
+        current = sorted_rectangles[index]
+        next_rect = sorted_rectangles[index+1]
+        distance = next_rect[0] - (current[0]+current[2]) #X_next - (X_current + W_current)
+        region_distances.append(distance)
+
+    return image_orig, sorted_regions, region_distances
 
 
 def scale_to_range(image):  # skalira elemente slike na opseg od 0 do 1
@@ -236,6 +249,28 @@ def display_result(outputs, alphabet):
         result.append(alphabet[winner(output)])
     return result
 
+def display_result_with_distances(outputs, alphabet, k_means):
+    '''
+    Funkcija određuje koja od grupa predstavlja razmak između reči, a koja između slova, i na osnovu
+    toga formira string od elemenata pronađenih sa slike.
+    Args:
+        outputs: niz izlaza iz neuronske mreže.
+        alphabet: niz karaktera koje je potrebno prepoznati
+        kmeans: obučen kmeans objekat
+    Return:
+        Vraća formatiran string
+    '''
+    # Odrediti indeks grupe koja odgovara rastojanju između reči, pomoću vrednosti iz k_means.cluster_centers_
+    w_space_group = max(enumerate(k_means.cluster_centers_), key = lambda x: x[1])[0]
+    result = alphabet[winner(outputs[0])]
+    for idx, output in enumerate(outputs[1:,:]):
+        # Iterativno dodavati prepoznate elemente kao u vežbi 2, alphabet[winner(output)]
+        # Dodati space karakter u slučaju da odgovarajuće rastojanje između dva slova odgovara razmaku između reči.
+        # U ovu svrhu, koristiti atribut niz k_means.labels_ koji sadrži sortirana rastojanja između susednih slova.
+        if (k_means.labels_[idx] == w_space_group):
+            result += ' '
+        result += alphabet[winner(output)]
+    return result
 
 def serialize_ann(ann):
     # serijalizuj arhitekturu neuronske mreze u JSON fajl
@@ -273,9 +308,9 @@ def create_inputs (train_image_paths):
         display_image(img)
         img_bin = erode(dilate(img))
         display_image(img_bin)
-        selected_regions, numbers = select_roi(image_color.copy(), img)
+        selected_regions, letters, distances = select_roi(image_color.copy(), img)
         # display_image(numbers[0])
-        for result in prepare_for_ann(numbers):
+        for result in prepare_for_ann(letters):
             inputs.append(result)
 
     return inputs
@@ -350,5 +385,42 @@ def extract_text_from_image(trained_model, image_path, vocabulary):
     """
     extracted_text = ""
     # TODO - Izvuci tekst sa ulazne fotografije i vratiti ga kao string
+
+    alphabet = ['A', 'B', 'C', 'Č', 'Ć', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q',
+                'R', 'S', 'Š', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'Ž', 'a', 'b', 'c', 'č', 'ć', 'd', 'e',
+                'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q',
+                'r', 's', 'š', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'ž']
+    # Učitavanje slike i određivanje regiona od interesa
+    # image_color = load_image(image_path)
+    # img = image_bin(image_gray(image_color))
+    # selected_regions, letters, distances = select_roi(image_color.copy(), img)
+    # display_image(selected_regions)
+    # print('Broj prepoznatih regiona:', len(letters))
+
+    inputs = []
+    image_color = load_image(image_path)
+    display_image(image_color)
+    img = invert(image_bin(image_gray(image_color)))
+    display_image(img)
+    img_bin = erode(dilate(img))
+    display_image(img_bin)
+    selected_regions, letters, distances = select_roi(image_color.copy(), img)
+    # display_image(numbers[0])
+    for result in prepare_for_ann(letters):
+        inputs.append(result)
+
+    if len(inputs) == 0:
+        return ""
+    # Podešavanje centara grupa K-means algoritmom
+    distances = np.array(distances).reshape(len(distances), 1)
+    # Neophodno je da u K-means algoritam bude prosleđena matrica u kojoj vrste određuju elemente
+    k_means = KMeans(n_clusters=2, max_iter=2000, tol=0.00001, n_init=10)
+    k_means.fit(distances)
+
+    # inputs = prepare_for_ann(letters)
+    results = trained_model.predict(np.array(inputs, np.float32))
+
+    extracted_text = display_result_with_distances(results, alphabet, k_means)
+    print(extracted_text)
 
     return extracted_text
