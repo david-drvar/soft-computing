@@ -12,12 +12,12 @@ from keras.optimizers import SGD
 from keras.models import model_from_json
 from keras.models import load_model
 
-#Sklearn biblioteka sa implementiranim K-means algoritmom
+# Sklearn biblioteka sa implementiranim K-means algoritmom
 from sklearn import datasets
 from sklearn.cluster import KMeans
 
 import matplotlib.pylab as pylab
-
+cancel = False
 
 def load_image(path):
     return cv2.cvtColor(cv2.imread(path), cv2.COLOR_BGR2RGB)
@@ -79,6 +79,8 @@ def select_roi(image_orig, image_bin):
         Kao povratnu vrednost vratiti originalnu sliku na kojoj su obeleženi regioni
         i niz slika koje predstavljaju regione sortirane po rastućoj vrednosti x ose
     '''
+    if cancel:
+        return None
     img, contours, hierarchy = cv2.findContours(image_bin.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     sorted_regions = []  # lista sortiranih regiona po x osi (sa leva na desno)
     regions_array = []
@@ -89,7 +91,7 @@ def select_roi(image_orig, image_bin):
             # kopirati [y:y+h+1, x:x+w+1] sa binarne slike i smestiti u novu sliku
             # označiti region pravougaonikom na originalnoj slici (image_orig) sa rectangle funkcijom
             region = image_bin[y:y + h + 1, x:x + w + 1]
-           # display_image(region)
+            # display_image(region)
             regions_array.append([resize_region(region), (x, y, w, h)])
             # cv2.rectangle(image_orig, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
@@ -158,10 +160,10 @@ def select_roi(image_orig, image_bin):
     region_distances = []
     # Izdvojiti sortirane parametre opisujućih pravougaonika
     # Izračunati rastojanja između svih susednih regiona po x osi i dodati ih u region_distances niz
-    for index in range(0, len(sorted_rectangles)-1):
+    for index in range(0, len(sorted_rectangles) - 1):
         current = sorted_rectangles[index]
-        next_rect = sorted_rectangles[index+1]
-        distance = next_rect[0] - (current[0]+current[2]) #X_next - (X_current + W_current)
+        next_rect = sorted_rectangles[index + 1]
+        distance = next_rect[0] - (current[0] + current[2])  # X_next - (X_current + W_current)
         region_distances.append(distance)
 
     return image_orig, sorted_regions, region_distances
@@ -247,6 +249,7 @@ def display_result(outputs, alphabet):
         result.append(alphabet[winner(output)])
     return result
 
+
 def display_result_with_distances(outputs, alphabet, k_means):
     '''
     Funkcija određuje koja od grupa predstavlja razmak između reči, a koja između slova, i na osnovu
@@ -259,9 +262,9 @@ def display_result_with_distances(outputs, alphabet, k_means):
         Vraća formatiran string
     '''
     # Odrediti indeks grupe koja odgovara rastojanju između reči, pomoću vrednosti iz k_means.cluster_centers_
-    w_space_group = max(enumerate(k_means.cluster_centers_), key = lambda x: x[1])[0]
+    w_space_group = max(enumerate(k_means.cluster_centers_), key=lambda x: x[1])[0]
     result = alphabet[winner(outputs[0])]
-    for idx, output in enumerate(outputs[1:,:]):
+    for idx, output in enumerate(outputs[1:, :]):
         # Iterativno dodavati prepoznate elemente kao u vežbi 2, alphabet[winner(output)]
         # Dodati space karakter u slučaju da odgovarajuće rastojanje između dva slova odgovara razmaku između reči.
         # U ovu svrhu, koristiti atribut niz k_means.labels_ koji sadrži sortirana rastojanja između susednih slova.
@@ -269,6 +272,7 @@ def display_result_with_distances(outputs, alphabet, k_means):
             result += ' '
         result += alphabet[winner(output)]
     return result
+
 
 def serialize_ann(ann):
     # serijalizuj arhitekturu neuronske mreze u JSON fajl
@@ -297,7 +301,8 @@ def load_trained_ann():
         # ako ucitavanje nije uspelo, verovatno model prethodno nije serijalizovan pa nema odakle da bude ucitan
         return None
 
-def create_inputs (train_image_paths):
+
+def create_inputs(train_image_paths):
     inputs = []
     for i in range(len(train_image_paths)):
         image_color = load_image(train_image_paths[i])
@@ -349,8 +354,6 @@ def train_or_load_character_recognition_model(train_image_paths, serialization_f
         # serijalizuj novu mrezu nakon treniranja, da se ne trenira ponovo svaki put
         serialize_ann(ann)
 
-
-
     result = ann.predict(np.array(inputs[1:3], np.float32))
     print(result)
     print(display_result(result, alphabet))
@@ -364,6 +367,9 @@ def train_or_load_character_recognition_model(train_image_paths, serialization_f
     print(display_result(result, alphabet))
 
     return ann
+
+
+
 
 
 def extract_text_from_image(trained_model, image_path, vocabulary):
@@ -381,6 +387,7 @@ def extract_text_from_image(trained_model, image_path, vocabulary):
     :param vocabulary: <Dict> Recnik SVIH poznatih reci i ucestalost njihovog pojavljivanja u tekstu
     :return: <String>  Tekst procitan sa ulazne slike
     """
+    global cancel
     extracted_text = ""
     # TODO - Izvuci tekst sa ulazne fotografije i vratiti ga kao string
 
@@ -399,15 +406,22 @@ def extract_text_from_image(trained_model, image_path, vocabulary):
     image_color = load_image(image_path)
     display_image(image_color)
     img = invert(image_bin(image_gray(image_color)))
-    display_image(img)
+    # display_image(img)
     img_bin = erode(dilate(img))
-    display_image(img_bin)
+    # display_image(img_bin)
+    if cancel:
+        return ""
+
     selected_regions, letters, distances = select_roi(image_color.copy(), img)
     # display_image(numbers[0])
+    if image_path == '.\\dataset\\validation\\train45.png':
+        cancel = True
+
+
     for result in prepare_for_ann(letters):
         inputs.append(result)
 
-    if len(inputs) == 0:
+    if len(inputs) == 0 or len(inputs) == 1:
         return ""
     # Podešavanje centara grupa K-means algoritmom
     distances = np.array(distances).reshape(len(distances), 1)
