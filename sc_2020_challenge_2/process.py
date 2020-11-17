@@ -6,9 +6,14 @@ import matplotlib.pyplot as plt
 import collections
 
 # keras
+import tensorflow as tf
 from keras.models import Sequential
 from keras.layers.core import Dense, Activation
 from keras.optimizers import SGD
+from keras.models import model_from_json
+from keras.models import load_model
+from tensorflow import keras
+
 
 import matplotlib.pylab as pylab
 
@@ -55,7 +60,7 @@ def erode(image):
 
 def resize_region(region):
     '''Transformisati selektovani region na sliku dimenzija 28x28'''
-    return cv2.resize(region, (28, 28), interpolation=cv2.INTER_NEAREST)
+    return cv2.resize(region, (100, 100), interpolation=cv2.INTER_NEAREST)
 
 
 def isAlreadyAdded(regions_array_filtered, x):
@@ -83,6 +88,7 @@ def select_roi(image_orig, image_bin):
             # kopirati [y:y+h+1, x:x+w+1] sa binarne slike i smestiti u novu sliku
             # označiti region pravougaonikom na originalnoj slici (image_orig) sa rectangle funkcijom
             region = image_bin[y:y + h + 1, x:x + w + 1]
+           # display_image(region)
             regions_array.append([resize_region(region), (x, y, w, h)])
             # cv2.rectangle(image_orig, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
@@ -196,7 +202,7 @@ def create_ann():
         128 neurona u skrivenom sloju i 10 neurona na izlazu. Aktivaciona funkcija je sigmoid.
     '''
     ann = Sequential()
-    ann.add(Dense(128, input_dim=784, activation='sigmoid'))
+    ann.add(Dense(128, input_dim=10000, activation='sigmoid'))
     ann.add(Dense(60, activation='sigmoid'))
     return ann
 
@@ -231,6 +237,50 @@ def display_result(outputs, alphabet):
     return result
 
 
+def serialize_ann(ann):
+    # serijalizuj arhitekturu neuronske mreze u JSON fajl
+    model_json = ann.to_json()
+    with open("serialized_model/neuronska.json", "w") as json_file:
+        json_file.write(model_json)
+    # serijalizuj tezine u HDF5 fajl
+    ann.save_weights("serialized_model/neuronska.h5")
+    # ann.save("my_model")
+
+
+def load_trained_ann():
+    try:
+        # Ucitaj JSON i kreiraj arhitekturu neuronske mreze na osnovu njega
+        json_file = open('serialized_model/neuronska.json', 'r')
+        loaded_model_json = json_file.read()
+        json_file.close()
+        ann = model_from_json(loaded_model_json)
+        # ucitaj tezine u prethodno kreirani model
+        ann.load_weights("serialized_model/neuronska.h5")
+        print("Istrenirani model uspesno ucitan.")
+        # ann = tf.keras.models.load_model("my_model", compile=False)
+        return ann
+    except Exception as e:
+        print(e)
+        # ako ucitavanje nije uspelo, verovatno model prethodno nije serijalizovan pa nema odakle da bude ucitan
+        return None
+
+def create_inputs (train_image_paths):
+    inputs = []
+    for i in range(len(train_image_paths)):
+        image_color = load_image(train_image_paths[i])
+        display_image(image_color)
+        img = invert(image_bin(image_gray(image_color)))
+        display_image(img)
+        img_bin = erode(dilate(img))
+        display_image(img_bin)
+        selected_regions, numbers = select_roi(image_color.copy(), img)
+        # display_image(numbers[0])
+        for result in prepare_for_ann(numbers):
+            inputs.append(result)
+
+    return inputs
+
+
 def train_or_load_character_recognition_model(train_image_paths, serialization_folder):
     """
     Procedura prima putanje do fotografija za obucavanje (dataset se sastoji iz razlicitih fotografija alfabeta), kao i
@@ -246,39 +296,37 @@ def train_or_load_character_recognition_model(train_image_paths, serialization_f
     :return: Objekat modela
     """
     # TODO - Istrenirati model ako vec nije istreniran, ili ga samo ucitati iz foldera za serijalizaciju
-    ann = create_ann()
 
-    inputs = []
     alphabet = ['A', 'B', 'C', 'Č', 'Ć', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q',
                 'R', 'S', 'Š', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'Ž', 'a', 'b', 'c', 'č', 'ć', 'd', 'e',
                 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q',
                 'r', 's', 'š', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'ž']
-    for i in range(len(train_image_paths)):
-        image_color = load_image(train_image_paths[i])
-        display_image(image_color)
-        img = invert(image_bin(image_gray(image_color)))
-        display_image(img)
-        img_bin = erode(dilate(img))
-        display_image(img_bin)
-        selected_regions, numbers = select_roi(image_color.copy(), img)
-        display_image(selected_regions)
-        # if i == 0:
-        #     alphabet = ['A', 'B', 'C', 'Č', 'Ć', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q',
-        #                 'R','S', 'Š', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'Ž']
-        # else:
-        #     alphabet = ['a', 'b', 'c', 'č', 'ć', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q',
-        #                 'r', 's', 'š', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'ž']
-        for result in prepare_for_ann(numbers):
-            inputs.append(result)
-        # inputs.append(prepare_for_ann(numbers))
+    inputs = create_inputs(train_image_paths)
 
-    outputs = convert_output(alphabet)
-    ann = train_ann(ann, inputs, outputs)
+    # probaj da ucitas prethodno istreniran model
+    ann = load_trained_ann()
 
-    # model = None
-    # return model
+    # ako je ann=None, znaci da model nije ucitan u prethodnoj metodi i da je potrebno istrenirati novu mrezu
+    if ann == None:
+        print("Traniranje modela zapoceto.")
+        ann = create_ann()
+        outputs = convert_output(alphabet)
+        ann = train_ann(ann, inputs, outputs)
+        print("Treniranje modela zavrseno.")
+        # serijalizuj novu mrezu nakon treniranja, da se ne trenira ponovo svaki put
+        serialize_ann(ann)
 
-    result = ann.predict(np.array(inputs[2:4], np.float32))
+
+
+    result = ann.predict(np.array(inputs[1:3], np.float32))
+    print(result)
+    print(display_result(result, alphabet))
+
+    result = ann.predict(np.array(inputs[4:6], np.float32))
+    print(result)
+    print(display_result(result, alphabet))
+
+    result = ann.predict(np.array(inputs[1:60], np.float32))
     print(result)
     print(display_result(result, alphabet))
 
