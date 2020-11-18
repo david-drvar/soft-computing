@@ -137,24 +137,6 @@ def select_roi(image_orig, image_bin):
                     cutout = image_bin[y:y + h + 1, x:x + w + 1]
                     regions_array_filtered.append([resize_region(cutout), (x, y, w, h)])
                     cv2.rectangle(image_orig, (x, y), (x + w, y + h), (255, 0, 0), 2)
-            # elif x1 < x2 < x1+w1:
-            #     x = x1
-            #     y= y2-10
-            #     w = 2*w2 - w1
-            #     h = h1 + h2+20
-            #     if not isAlreadyAdded(regions_array_filtered, x):
-            #         cutout = image_bin[y:y + h + 1, x:x + w + 1]
-            #         regions_array_filtered.append([resize_region(cutout), (x, y, w, h)])
-            #         cv2.rectangle(image_orig, (x, y), (x + w, y + h), (0, 0, 0), 2)
-            # elif x2 < x1 <x2+w2:
-            #     x = x2
-            #     y= y1-10
-            #     w = 2*w1 - w2
-            #     h = h1 + h2 + 20
-            #     if not isAlreadyAdded(regions_array_filtered, x):
-            #         cutout = image_bin[y:y + h + 1, x:x + w + 1]
-            #         regions_array_filtered.append([resize_region(cutout), (x, y, w, h)])
-            #         cv2.rectangle(image_orig, (x, y), (x + w, y + h), (0, 0, 0), 2)
         if not found and w1 > 20:
             cutout = image_bin[y1:y1 + h1 + 1, x1:x1 + w1 + 1]
             regions_array_filtered.append([resize_region(cutout), (x1, y1, w1, h1)])
@@ -172,7 +154,14 @@ def select_roi(image_orig, image_bin):
         distance = next_rect[0] - (current[0] + current[2])  # X_next - (X_current + W_current)
         region_distances.append(distance)
 
-    return image_orig, sorted_regions, region_distances
+    # computer countour center
+    centers = []
+    for contour in sorted_rectangles: # x, y, w, h
+        cx = contour[0] + contour[2] / 2
+        cy = contour[1] + contour[3] / 2
+        centers.append((cx,cy))
+
+    return image_orig, sorted_regions, region_distances, centers
 
 
 def scale_to_range(image):  # skalira elemente slike na opseg od 0 do 1
@@ -317,7 +306,7 @@ def create_inputs(train_image_paths):
         display_image(img)
         img_bin = erode(dilate(img))
         display_image(img_bin)
-        selected_regions, letters, distances = select_roi(image_color.copy(), img)
+        selected_regions, letters, distances, centers = select_roi(image_color.copy(), img)
         # display_image(numbers[0])
         for result in prepare_for_ann(letters):
             inputs.append(result)
@@ -360,70 +349,10 @@ def train_or_load_character_recognition_model(train_image_paths, serialization_f
         # serijalizuj novu mrezu nakon treniranja, da se ne trenira ponovo svaki put
         serialize_ann(ann)
 
-    result = ann.predict(np.array(inputs[1:3], np.float32))
-    print(result)
-    print(display_result(result, alphabet))
-
-    result = ann.predict(np.array(inputs[4:6], np.float32))
-    print(result)
-    print(display_result(result, alphabet))
-
-    result = ann.predict(np.array(inputs[0:60], np.float32))
-    print(result)
-    print(display_result(result, alphabet))
 
     return ann
 
 
-def compute_skew(file_name):
-    # load in grayscale:
-    src = cv2.imread(file_name, 0)
-    height, width = src.shape[0:2]
-
-    # invert the colors of our image:
-    cv2.bitwise_not(src, src)
-
-    # Hough transform:
-    minLineLength = width / 2.0
-    maxLineGap = 20
-    lines = cv2.HoughLinesP(src, 1, np.pi / 180, 100, minLineLength, maxLineGap)
-
-    # calculate the angle between each line and the horizontal line:
-    angle = 0.0
-    nb_lines = len(lines)
-
-    for line in lines:
-        angle += math.atan2(line[0][3] * 1.0 - line[0][1] * 1.0, line[0][2] * 1.0 - line[0][0] * 1.0);
-
-    angle /= nb_lines * 1.0
-
-    return angle * 180.0 / np.pi
-
-
-def deskew(file_name, angle):
-    # load in grayscale:
-    img = cv2.imread(file_name, 0)
-
-    # invert the colors of our image:
-    cv2.bitwise_not(img, img)
-
-    # compute the minimum bounding box:
-    non_zero_pixels = cv2.findNonZero(img)
-    center, wh, theta = cv2.minAreaRect(non_zero_pixels)
-
-    root_mat = cv2.getRotationMatrix2D(center, angle, 1)
-    rows, cols = img.shape
-    rotated = cv2.warpAffine(img, root_mat, (cols, rows), flags=cv2.INTER_CUBIC)
-
-    # Border removing:
-    sizex = np.int0(wh[0])
-    sizey = np.int0(wh[1])
-
-    if theta > -45:
-        temp = sizex
-        sizex = sizey
-        sizey = temp
-    return cv2.getRectSubPix(rotated, (sizey, sizex), center)
 
 
 def extract_text_from_image(trained_model, image_path, vocabulary):
@@ -450,62 +379,39 @@ def extract_text_from_image(trained_model, image_path, vocabulary):
                 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q',
                 'r', 's', 'š', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'ž']
     # Učitavanje slike i određivanje regiona od interesa
-    # image_color = load_image(image_path)
-    # img = image_bin(image_gray(image_color))
-    # selected_regions, letters, distances = select_roi(image_color.copy(), img)
-    # display_image(selected_regions)
-    # print('Broj prepoznatih regiona:', len(letters))
-
 
 
     inputs = []
     image_color = load_image(image_path)
     display_image(image_color)
     img = invert(image_bin(image_gray(image_color)))
-    # display_image(img)
+    display_image(img)
     img_bin = erode(dilate(img))
     # display_image(img_bin)
     # if cancel:
     #     return ""
 
-    # todo 2
-    thresh = cv2.threshold(img_bin, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
-    # coords = np.column_stack(np.where(thresh > 0))
-    # angle = cv2.minAreaRect(coords)[-1]
-    # if angle < -45:
-    #     angle = -(90 + angle)
-    # else:
-    #     angle = -angle
-    #
-    # (h, w) = image_color.shape[:2]
-    # center = (w // 2, h // 2)
-    # M = cv2.getRotationMatrix2D(center, angle, 1.0)
-    # rotated = cv2.warpAffine(image_color, M, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
-    #
-    # cv2.putText(rotated, "Angle: {:.2f} degrees".format(angle), (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-    # display_image(rotated)
 
-    # todo 2
-    # coords = np.column_stack(np.where(thresh > 0))
-    # hgt_rot_angle = cv2.minAreaRect(coords)[-1]
-    # com_rot_angle = hgt_rot_angle + 90 if hgt_rot_angle < -45 else hgt_rot_angle
-    #
-    # (h, w) = image_color.shape[0:2]
-    # center = (w // 2, h // 2)
-    # M = cv2.getRotationMatrix2D(center, com_rot_angle, 1.0)
-    # corrected_image = cv2.warpAffine(image_color, M, (w, h), flags=cv2.INTER_CUBIC,borderMode=cv2.BORDER_REPLICATE)
-    # display_image(corrected_image)
 
-    # todo 3
-    # file_path =  image_path
-    # angel = compute_skew(file_path)
-    # dst = deskew(file_path, angel)
-    # display_image(dst)
+    selected_regions, letters, distances, centers = select_roi(image_color.copy(), img)
 
-    selected_regions, letters, distances = select_roi(image_color.copy(), img)
-    # display_image(numbers[0])
-    # if image_path == '.\\dataset\\validation\\train45.png':
-    #     cancel = True
+
+    p0,p1,p2,p3 = cv2.fitLine(np.array(centers), cv2.DIST_L1, 0, 0.1,0.01)
+    temp = cv2.imread(image_path)
+    height, width, channels = temp.shape
+
+    x0 = p2
+    y0 = p3
+    k = p1 / p0
+
+    point1X = 0
+    point1Y = k*(0 - x0) + y0
+    point2X = width
+    point2Y = k * (width - x0) + y0
+    if point1Y>height or point2Y>height:
+        return ""
+    cv2.line(image_color, (point1X, point1Y), (point2X,point2Y), (0, 255, 0), thickness=15)
+    display_image(image_color)
 
     if cancel:
         return ""
