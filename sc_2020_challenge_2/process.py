@@ -14,12 +14,16 @@ from keras.optimizers import SGD
 from keras.models import model_from_json
 from keras.models import load_model
 
+from fuzzywuzzy import fuzz
+from fuzzywuzzy import process
+
 # Sklearn biblioteka sa implementiranim K-means algoritmom
 from sklearn import datasets
 from sklearn.cluster import KMeans
 
 import matplotlib.pylab as pylab
-cancel = False
+
+
 
 def load_image(path):
     return cv2.cvtColor(cv2.imread(path), cv2.COLOR_BGR2RGB)
@@ -63,9 +67,8 @@ def erode(image):
 
 def resize_region(region):
     '''Transformisati selektovani region na sliku dimenzija 28x28'''
-    global cancel
-    if region.shape[0] == 0 or region.shape[1]==0:
-        cancel = True
+
+    if region.shape[0] == 0 or region.shape[1] == 0:
         return None
     return cv2.resize(region, (100, 100), interpolation=cv2.INTER_NEAREST)
 
@@ -156,10 +159,10 @@ def select_roi(image_orig, image_bin):
 
     # computer countour center
     centers = []
-    for contour in sorted_rectangles: # x, y, w, h
+    for contour in sorted_rectangles:  # x, y, w, h
         cx = contour[0] + contour[2] / 2
         cy = contour[1] + contour[3] / 2
-        centers.append((cx,cy))
+        centers.append((cx, cy))
 
     return image_orig, sorted_regions, region_distances, centers
 
@@ -210,7 +213,7 @@ def create_ann():
         128 neurona u skrivenom sloju i 10 neurona na izlazu. Aktivaciona funkcija je sigmoid.
     '''
     ann = Sequential()
-    ann.add(Dense(128, input_dim=10000, activation='sigmoid'))
+    ann.add(Dense(256, input_dim=10000, activation='sigmoid'))
     ann.add(Dense(60, activation='sigmoid'))
     return ann
 
@@ -225,7 +228,7 @@ def train_ann(ann, X_train, y_train):
     ann.compile(loss='mean_squared_error', optimizer=sgd)
 
     # obucavanje neuronske mreze
-    ann.fit(X_train, y_train, epochs=500, batch_size=1, verbose=0, shuffle=False)
+    ann.fit(X_train, y_train, epochs=1500, batch_size=1, verbose=0, shuffle=True)
 
     return ann
 
@@ -307,7 +310,7 @@ def create_inputs(train_image_paths):
         img_bin = erode(dilate(img))
         display_image(img_bin)
         selected_regions, letters, distances, centers = select_roi(image_color.copy(), img)
-        # display_image(numbers[0])
+        display_image(selected_regions)
         for result in prepare_for_ann(letters):
             inputs.append(result)
 
@@ -349,10 +352,26 @@ def train_or_load_character_recognition_model(train_image_paths, serialization_f
         # serijalizuj novu mrezu nakon treniranja, da se ne trenira ponovo svaki put
         serialize_ann(ann)
 
-
     return ann
 
 
+def postprocess(extracted_text, vocabulary):
+    vocabulary_words = vocabulary.keys()
+
+    text_splits = extracted_text.split(" ")
+    improved_text = ""
+    i = 0
+    for word in text_splits:
+        highest = process.extractOne(word, vocabulary_words)
+        temp = highest[0]
+        if i > 0:
+            temp = str.lower(highest[0])
+        improved_text = improved_text + temp + " "
+        i = i + 1
+
+    ret = improved_text[:-1]
+
+    return ret
 
 
 def extract_text_from_image(trained_model, image_path, vocabulary):
@@ -370,85 +389,91 @@ def extract_text_from_image(trained_model, image_path, vocabulary):
     :param vocabulary: <Dict> Recnik SVIH poznatih reci i ucestalost njihovog pojavljivanja u tekstu
     :return: <String>  Tekst procitan sa ulazne slike
     """
-    global cancel
-    extracted_text = ""
-    # TODO - Izvuci tekst sa ulazne fotografije i vratiti ga kao string
+    try:
 
-    alphabet = ['A', 'B', 'C', 'Č', 'Ć', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q',
-                'R', 'S', 'Š', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'Ž', 'a', 'b', 'c', 'č', 'ć', 'd', 'e',
-                'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q',
-                'r', 's', 'š', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'ž']
+        extracted_text = ""
+        # TODO - Izvuci tekst sa ulazne fotografije i vratiti ga kao string
 
+        alphabet = ['A', 'B', 'C', 'Č', 'Ć', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q',
+                    'R', 'S', 'Š', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'Ž', 'a', 'b', 'c', 'č', 'ć', 'd', 'e',
+                    'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q',
+                    'r', 's', 'š', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'ž']
 
-    inputs = []
-    image_color = load_image(image_path)
-    # display_image(image_color)
-    img = invert(image_bin(image_gray(image_color)))
-    # display_image(img)
-    img_bin = erode(dilate(img))
-    # display_image(img_bin)
-    # if cancel:
-    #     return ""
+        inputs = []
+        image_color = load_image(image_path)
+        # display_image(image_color)
+        img = invert(image_bin(image_gray(image_color)))
+        # display_image(img)
+        img_bin = erode(dilate(img))
+        # display_image(img_bin)
+        # if cancel:
+        #     return ""
 
+        selected_regions, letters, distances, centers = select_roi(image_color.copy(), img)
 
+        p0, p1, p2, p3 = cv2.fitLine(np.array(centers), cv2.DIST_L1, 0, 0.1, 0.01)
+        temp = cv2.imread(image_path)
+        height, width, channels = temp.shape
 
-    selected_regions, letters, distances, centers = select_roi(image_color.copy(), img)
+        x0 = p2
+        y0 = p3
+        k = p1 / p0
 
+        angle_in_radians = math.atan(k)
+        angle_in_degrees = math.degrees(angle_in_radians)
+        print(angle_in_degrees)
 
-    p0,p1,p2,p3 = cv2.fitLine(np.array(centers), cv2.DIST_L1, 0, 0.1,0.01)
-    temp = cv2.imread(image_path)
-    height, width, channels = temp.shape
+        point1X = 0
+        point1Y = k * (0 - x0) + y0
+        point2X = width
+        point2Y = k * (width - x0) + y0
+        if point1Y > height or point2Y > height:
+            return ""
+        # cv2.line(image_color, (point1X, point1Y), (point2X,point2Y), (0, 255, 0), thickness=15)
+        display_image(image_color)
 
-    x0 = p2
-    y0 = p3
-    k = p1 / p0
+        (h, w) = image_color.shape[:2]
+        center = (w // 2, h // 2)
+        M = cv2.getRotationMatrix2D(center, angle_in_degrees, 1.0)
+        newImage = cv2.warpAffine(image_color, M, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+        display_image(newImage)
 
-    angle_in_radians = math.atan(k)
-    angle_in_degrees = math.degrees(angle_in_radians)
-    print(angle_in_degrees)
+        img = invert(image_bin(image_gray(newImage)))
+        display_image(img)
 
-    point1X = 0
-    point1Y = k*(0 - x0) + y0
-    point2X = width
-    point2Y = k * (width - x0) + y0
-    if point1Y>height or point2Y>height:
+        selected_regions, letters, distances, centers = select_roi(newImage.copy(), img)
+
+        # if cancel:
+        #     return ""
+
+        for result in prepare_for_ann(letters):
+            inputs.append(result)
+
+        # if len(inputs) == 0 or len(inputs) == 1:
+        #     return ""
+        #
+        # if len(letters) == 0 or len(letters) == 1 or len(distances) == 0 or len(distances) == 1:
+        #     return ""
+
+        # Podešavanje centara grupa K-means algoritmom
+        distances = np.array(distances).reshape(len(distances), 1)
+        # Neophodno je da u K-means algoritam bude prosleđena matrica u kojoj vrste određuju elemente
+        k_means = KMeans(n_clusters=2, max_iter=2000, tol=0.00001, n_init=10)
+        k_means.fit(distances)
+
+        # inputs = prepare_for_ann(letters)
+        results = trained_model.predict(np.array(inputs, np.float32))
+
+        extracted_text = display_result_with_distances(results, alphabet, k_means)
+        print(extracted_text)
+
+        improved_text = postprocess(extracted_text, vocabulary)
+
+        return improved_text
+
+    except Exception as e:
+        print(e)
         return ""
-    # cv2.line(image_color, (point1X, point1Y), (point2X,point2Y), (0, 255, 0), thickness=15)
-    display_image(image_color)
 
-    (h, w) = image_color.shape[:2]
-    center = (w // 2, h // 2)
-    M = cv2.getRotationMatrix2D(center, angle_in_degrees, 1.0)
-    newImage = cv2.warpAffine(image_color, M, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
-    display_image(newImage)
-
-    img = invert(image_bin(image_gray(newImage)))
-    display_image(img)
-
-    selected_regions, letters, distances, centers = select_roi(newImage.copy(), img)
-
-    if cancel:
-        return ""
-
-    for result in prepare_for_ann(letters):
-        inputs.append(result)
-
-    if len(inputs) == 0 or len(inputs) == 1:
-        return ""
-
-    if len(letters) == 0 or len(letters) == 1 or len(distances) == 0 or len(distances) == 1:
-        return ""
-
-    # Podešavanje centara grupa K-means algoritmom
-    distances = np.array(distances).reshape(len(distances), 1)
-    # Neophodno je da u K-means algoritam bude prosleđena matrica u kojoj vrste određuju elemente
-    k_means = KMeans(n_clusters=2, max_iter=2000, tol=0.00001, n_init=10)
-    k_means.fit(distances)
-
-    # inputs = prepare_for_ann(letters)
-    results = trained_model.predict(np.array(inputs, np.float32))
-
-    extracted_text = display_result_with_distances(results, alphabet, k_means)
-    print(extracted_text)
-
-    return extracted_text
+# pokusaj i da sredis
+# pozadinske slike da resis
