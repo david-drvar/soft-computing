@@ -5,6 +5,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import collections
 
+import math
+
 # keras
 from keras.models import Sequential
 from keras.layers.core import Dense, Activation
@@ -61,6 +63,10 @@ def erode(image):
 
 def resize_region(region):
     '''Transformisati selektovani region na sliku dimenzija 28x28'''
+    global cancel
+    if region.shape[0] == 0 or region.shape[1]==0:
+        cancel = True
+        return None
     return cv2.resize(region, (100, 100), interpolation=cv2.INTER_NEAREST)
 
 
@@ -79,8 +85,8 @@ def select_roi(image_orig, image_bin):
         Kao povratnu vrednost vratiti originalnu sliku na kojoj su obeleženi regioni
         i niz slika koje predstavljaju regione sortirane po rastućoj vrednosti x ose
     '''
-    if cancel:
-        return None
+    # if cancel:
+    #     return None
     img, contours, hierarchy = cv2.findContours(image_bin.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     sorted_regions = []  # lista sortiranih regiona po x osi (sa leva na desno)
     regions_array = []
@@ -369,7 +375,55 @@ def train_or_load_character_recognition_model(train_image_paths, serialization_f
     return ann
 
 
+def compute_skew(file_name):
+    # load in grayscale:
+    src = cv2.imread(file_name, 0)
+    height, width = src.shape[0:2]
 
+    # invert the colors of our image:
+    cv2.bitwise_not(src, src)
+
+    # Hough transform:
+    minLineLength = width / 2.0
+    maxLineGap = 20
+    lines = cv2.HoughLinesP(src, 1, np.pi / 180, 100, minLineLength, maxLineGap)
+
+    # calculate the angle between each line and the horizontal line:
+    angle = 0.0
+    nb_lines = len(lines)
+
+    for line in lines:
+        angle += math.atan2(line[0][3] * 1.0 - line[0][1] * 1.0, line[0][2] * 1.0 - line[0][0] * 1.0);
+
+    angle /= nb_lines * 1.0
+
+    return angle * 180.0 / np.pi
+
+
+def deskew(file_name, angle):
+    # load in grayscale:
+    img = cv2.imread(file_name, 0)
+
+    # invert the colors of our image:
+    cv2.bitwise_not(img, img)
+
+    # compute the minimum bounding box:
+    non_zero_pixels = cv2.findNonZero(img)
+    center, wh, theta = cv2.minAreaRect(non_zero_pixels)
+
+    root_mat = cv2.getRotationMatrix2D(center, angle, 1)
+    rows, cols = img.shape
+    rotated = cv2.warpAffine(img, root_mat, (cols, rows), flags=cv2.INTER_CUBIC)
+
+    # Border removing:
+    sizex = np.int0(wh[0])
+    sizey = np.int0(wh[1])
+
+    if theta > -45:
+        temp = sizex
+        sizex = sizey
+        sizey = temp
+    return cv2.getRectSubPix(rotated, (sizey, sizex), center)
 
 
 def extract_text_from_image(trained_model, image_path, vocabulary):
@@ -402,6 +456,8 @@ def extract_text_from_image(trained_model, image_path, vocabulary):
     # display_image(selected_regions)
     # print('Broj prepoznatih regiona:', len(letters))
 
+
+
     inputs = []
     image_color = load_image(image_path)
     display_image(image_color)
@@ -409,20 +465,59 @@ def extract_text_from_image(trained_model, image_path, vocabulary):
     # display_image(img)
     img_bin = erode(dilate(img))
     # display_image(img_bin)
-    if cancel:
-        return ""
+    # if cancel:
+    #     return ""
+
+    # todo 2
+    thresh = cv2.threshold(img_bin, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
+    # coords = np.column_stack(np.where(thresh > 0))
+    # angle = cv2.minAreaRect(coords)[-1]
+    # if angle < -45:
+    #     angle = -(90 + angle)
+    # else:
+    #     angle = -angle
+    #
+    # (h, w) = image_color.shape[:2]
+    # center = (w // 2, h // 2)
+    # M = cv2.getRotationMatrix2D(center, angle, 1.0)
+    # rotated = cv2.warpAffine(image_color, M, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+    #
+    # cv2.putText(rotated, "Angle: {:.2f} degrees".format(angle), (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+    # display_image(rotated)
+
+    # todo 2
+    # coords = np.column_stack(np.where(thresh > 0))
+    # hgt_rot_angle = cv2.minAreaRect(coords)[-1]
+    # com_rot_angle = hgt_rot_angle + 90 if hgt_rot_angle < -45 else hgt_rot_angle
+    #
+    # (h, w) = image_color.shape[0:2]
+    # center = (w // 2, h // 2)
+    # M = cv2.getRotationMatrix2D(center, com_rot_angle, 1.0)
+    # corrected_image = cv2.warpAffine(image_color, M, (w, h), flags=cv2.INTER_CUBIC,borderMode=cv2.BORDER_REPLICATE)
+    # display_image(corrected_image)
+
+    # todo 3
+    # file_path =  image_path
+    # angel = compute_skew(file_path)
+    # dst = deskew(file_path, angel)
+    # display_image(dst)
 
     selected_regions, letters, distances = select_roi(image_color.copy(), img)
     # display_image(numbers[0])
-    if image_path == '.\\dataset\\validation\\train45.png':
-        cancel = True
+    # if image_path == '.\\dataset\\validation\\train45.png':
+    #     cancel = True
 
-
+    if cancel:
+        return ""
     for result in prepare_for_ann(letters):
         inputs.append(result)
 
     if len(inputs) == 0 or len(inputs) == 1:
         return ""
+
+    if len(letters) == 0 or len(letters) == 1 or len(distances) == 0 or len(distances) == 1:
+        return ""
+
     # Podešavanje centara grupa K-means algoritmom
     distances = np.array(distances).reshape(len(distances), 1)
     # Neophodno je da u K-means algoritam bude prosleđena matrica u kojoj vrste određuju elemente
