@@ -378,14 +378,13 @@ def extract_text_from_image(trained_model, image_path, vocabulary):
                 'R', 'S', 'Š', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'Ž', 'a', 'b', 'c', 'č', 'ć', 'd', 'e',
                 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q',
                 'r', 's', 'š', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'ž']
-    # Učitavanje slike i određivanje regiona od interesa
 
 
     inputs = []
     image_color = load_image(image_path)
-    display_image(image_color)
+    # display_image(image_color)
     img = invert(image_bin(image_gray(image_color)))
-    display_image(img)
+    # display_image(img)
     img_bin = erode(dilate(img))
     # display_image(img_bin)
     # if cancel:
@@ -404,17 +403,33 @@ def extract_text_from_image(trained_model, image_path, vocabulary):
     y0 = p3
     k = p1 / p0
 
+    angle_in_radians = math.atan(k)
+    angle_in_degrees = math.degrees(angle_in_radians)
+    print(angle_in_degrees)
+
     point1X = 0
     point1Y = k*(0 - x0) + y0
     point2X = width
     point2Y = k * (width - x0) + y0
     if point1Y>height or point2Y>height:
         return ""
-    cv2.line(image_color, (point1X, point1Y), (point2X,point2Y), (0, 255, 0), thickness=15)
+    # cv2.line(image_color, (point1X, point1Y), (point2X,point2Y), (0, 255, 0), thickness=15)
     display_image(image_color)
+
+    (h, w) = image_color.shape[:2]
+    center = (w // 2, h // 2)
+    M = cv2.getRotationMatrix2D(center, angle_in_degrees, 1.0)
+    newImage = cv2.warpAffine(image_color, M, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+    display_image(newImage)
+
+    img = invert(image_bin(image_gray(newImage)))
+    display_image(img)
+
+    selected_regions, letters, distances, centers = select_roi(newImage.copy(), img)
 
     if cancel:
         return ""
+
     for result in prepare_for_ann(letters):
         inputs.append(result)
 

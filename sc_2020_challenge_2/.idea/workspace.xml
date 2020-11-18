@@ -4,6 +4,7 @@
     <list default="true" id="967ac12a-48b3-49b9-bf24-57dfc260edc8" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/process.py" beforeDir="false" afterPath="$PROJECT_DIR$/process.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/result.csv" beforeDir="false" afterPath="$PROJECT_DIR$/result.csv" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -130,7 +131,7 @@
       <workItem from="1605522884203" duration="15061000" />
       <workItem from="1605609062057" duration="10109000" />
       <workItem from="1605639601848" duration="8485000" />
-      <workItem from="1605705339107" duration="8165000" />
+      <workItem from="1605705339107" duration="9769000" />
     </task>
     <servers />
   </component>
@@ -166,38 +167,38 @@
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="740" y="303" key="FileChooserDialogImpl/0.0.1920.1080@0.0.1920.1080" timestamp="1605442916702" />
-    <state width="1877" height="297" key="GridCell.Tab.0.bottom" timestamp="1605714733605">
+    <state width="1877" height="297" key="GridCell.Tab.0.bottom" timestamp="1605718264550">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1877" height="297" key="GridCell.Tab.0.bottom/0.0.1920.1080@0.0.1920.1080" timestamp="1605714733605" />
-    <state width="1877" height="297" key="GridCell.Tab.0.center" timestamp="1605714733605">
+    <state width="1877" height="297" key="GridCell.Tab.0.bottom/0.0.1920.1080@0.0.1920.1080" timestamp="1605718264550" />
+    <state width="1877" height="297" key="GridCell.Tab.0.center" timestamp="1605718264549">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1877" height="297" key="GridCell.Tab.0.center/0.0.1920.1080@0.0.1920.1080" timestamp="1605714733605" />
-    <state width="1877" height="297" key="GridCell.Tab.0.left" timestamp="1605714733605">
+    <state width="1877" height="297" key="GridCell.Tab.0.center/0.0.1920.1080@0.0.1920.1080" timestamp="1605718264549" />
+    <state width="1877" height="297" key="GridCell.Tab.0.left" timestamp="1605718264549">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1877" height="297" key="GridCell.Tab.0.left/0.0.1920.1080@0.0.1920.1080" timestamp="1605714733605" />
-    <state width="1877" height="297" key="GridCell.Tab.0.right" timestamp="1605714733605">
+    <state width="1877" height="297" key="GridCell.Tab.0.left/0.0.1920.1080@0.0.1920.1080" timestamp="1605718264549" />
+    <state width="1877" height="297" key="GridCell.Tab.0.right" timestamp="1605718264549">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1877" height="297" key="GridCell.Tab.0.right/0.0.1920.1080@0.0.1920.1080" timestamp="1605714733605" />
-    <state width="1877" height="367" key="GridCell.Tab.1.bottom" timestamp="1605714589115">
+    <state width="1877" height="297" key="GridCell.Tab.0.right/0.0.1920.1080@0.0.1920.1080" timestamp="1605718264549" />
+    <state width="1877" height="367" key="GridCell.Tab.1.bottom" timestamp="1605718259289">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1877" height="367" key="GridCell.Tab.1.bottom/0.0.1920.1080@0.0.1920.1080" timestamp="1605714589115" />
-    <state width="1877" height="367" key="GridCell.Tab.1.center" timestamp="1605714589115">
+    <state width="1877" height="367" key="GridCell.Tab.1.bottom/0.0.1920.1080@0.0.1920.1080" timestamp="1605718259289" />
+    <state width="1877" height="367" key="GridCell.Tab.1.center" timestamp="1605718259289">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1877" height="367" key="GridCell.Tab.1.center/0.0.1920.1080@0.0.1920.1080" timestamp="1605714589115" />
-    <state width="1877" height="367" key="GridCell.Tab.1.left" timestamp="1605714589115">
+    <state width="1877" height="367" key="GridCell.Tab.1.center/0.0.1920.1080@0.0.1920.1080" timestamp="1605718259289" />
+    <state width="1877" height="367" key="GridCell.Tab.1.left" timestamp="1605718259289">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1877" height="367" key="GridCell.Tab.1.left/0.0.1920.1080@0.0.1920.1080" timestamp="1605714589115" />
-    <state width="1877" height="367" key="GridCell.Tab.1.right" timestamp="1605714589115">
+    <state width="1877" height="367" key="GridCell.Tab.1.left/0.0.1920.1080@0.0.1920.1080" timestamp="1605718259289" />
+    <state width="1877" height="367" key="GridCell.Tab.1.right" timestamp="1605718259289">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1877" height="367" key="GridCell.Tab.1.right/0.0.1920.1080@0.0.1920.1080" timestamp="1605714589115" />
+    <state width="1877" height="367" key="GridCell.Tab.1.right/0.0.1920.1080@0.0.1920.1080" timestamp="1605718259289" />
     <state x="461" y="182" key="SettingsEditor" timestamp="1605707783141">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
@@ -206,13 +207,33 @@
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state width="968" height="548" key="XDebugger.FullValuePopup/0.0.1920.1080@0.0.1920.1080" timestamp="1605610662622" />
+    <state x="521" y="276" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2" timestamp="1605717177960">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state x="521" y="276" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2/0.0.1920.1080@0.0.1920.1080" timestamp="1605717177960" />
     <state x="1103" y="235" width="672" height="678" key="search.everywhere.popup" timestamp="1605646514204">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="1103" y="235" width="672" height="678" key="search.everywhere.popup/0.0.1920.1080@0.0.1920.1080" timestamp="1605646514204" />
   </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/process.py</url>
+          <line>427</line>
+          <option name="timeStamp" value="54" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/process.py</url>
+          <line>451</line>
+          <option name="timeStamp" value="55" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/sc_2020_challenge_2$evaluate.coverage" NAME="evaluate Coverage Results" MODIFIED="1605714663868" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/sc_2020_challenge_2$main.coverage" NAME="main Coverage Results" MODIFIED="1605714589091" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/sc_2020_challenge_2$evaluate.coverage" NAME="evaluate Coverage Results" MODIFIED="1605718259275" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/sc_2020_challenge_2$main.coverage" NAME="main Coverage Results" MODIFIED="1605718042511" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
