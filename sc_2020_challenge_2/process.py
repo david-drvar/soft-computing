@@ -171,6 +171,88 @@ def select_roi(image_orig, image_bin):
 
     return image_orig, sorted_regions, region_distances, centers
 
+def select_roi_train(image_orig, image_bin):
+    '''Oznaciti regione od interesa na originalnoj slici. (ROI = regions of interest)
+        Za svaki region napraviti posebnu sliku dimenzija 28 x 28.
+        Za označavanje regiona koristiti metodu cv2.boundingRect(contour).
+        Kao povratnu vrednost vratiti originalnu sliku na kojoj su obeleženi regioni
+        i niz slika koje predstavljaju regione sortirane po rastućoj vrednosti x ose
+    '''
+    # if cancel:
+    #     return None
+    img, contours, hierarchy = cv2.findContours(image_bin.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    sorted_regions = []  # lista sortiranih regiona po x osi (sa leva na desno)
+    regions_array = []
+    for i in range(len(contours)):
+        x, y, w, h = cv2.boundingRect(contours[i])  # koordinate i velicina granicnog pravougaonika
+        area = cv2.contourArea(contours[i])
+        if w > 5 and h > 25 and hierarchy[0, i, 3] == -1:
+            region = image_bin[y:y + h + 1, x:x + w + 1]
+            # display_image(region)
+            regions_array.append([resize_region(region), (x, y, w, h)])
+            # cv2.rectangle(image_orig, (x, y), (x + w, y + h), (0, 255, 0), 2)
+
+    # sortirati sve regione po x osi (sa leva na desno) i smestiti u promenljivu sorted_regions
+    regions_array = sorted(regions_array, key=lambda item: item[1][0])
+
+    regions_array_filtered = []
+
+    for region in regions_array:
+        x1 = region[1][0]
+        y1 = region[1][1]
+        w1 = region[1][2]
+        h1 = region[1][3]
+        found = False
+        for smaller_region in regions_array:
+            x2 = smaller_region[1][0]
+            y2 = smaller_region[1][1]
+            w2 = smaller_region[1][2]
+            h2 = smaller_region[1][3]
+            if x2 > x1 and x2 + w2 < x1 + w1:
+                found = True
+                x = x1
+                y = y2
+                w = w1
+                h = h1 + h2
+                if not isAlreadyAdded(regions_array_filtered, x):
+                    cutout = image_bin[y:y + h + 1, x:x + w + 1]
+                    regions_array_filtered.append([resize_region(cutout), (x, y, w, h)])
+                    cv2.rectangle(image_orig, (x, y), (x + w, y + h), (255, 0, 0), 2)
+            elif x2 < x1 and x2 + w2 > x1 + w1:
+                found = True
+                x = x2
+                y = y1
+                w = w2
+                h = h1 + h2
+                if not isAlreadyAdded(regions_array_filtered, x):
+                    cutout = image_bin[y:y + h + 1, x:x + w + 1]
+                    regions_array_filtered.append([resize_region(cutout), (x, y, w, h)])
+                    cv2.rectangle(image_orig, (x, y), (x + w, y + h), (255, 0, 0), 2)
+        if not found:
+            cutout = image_bin[y1:y1 + h1 + 1, x1:x1 + w1 + 1]
+            regions_array_filtered.append([resize_region(cutout), (x1, y1, w1, h1)])
+            cv2.rectangle(image_orig, (x1, y1), (x1 + w1, y1 + h1), (0, 255, 0), 2)
+
+    sorted_regions = [region[0] for region in regions_array_filtered]
+
+    sorted_rectangles = [region[1] for region in regions_array_filtered]
+    region_distances = []
+    # Izdvojiti sortirane parametre opisujućih pravougaonika
+    # Izračunati rastojanja između svih susednih regiona po x osi i dodati ih u region_distances niz
+    for index in range(0, len(sorted_rectangles) - 1):
+        current = sorted_rectangles[index]
+        next_rect = sorted_rectangles[index + 1]
+        distance = next_rect[0] - (current[0] + current[2])  # X_next - (X_current + W_current)
+        region_distances.append(distance)
+
+    # computer countour center
+    centers = []
+    for contour in sorted_rectangles:  # x, y, w, h
+        cx = contour[0] + contour[2] / 2
+        cy = contour[1] + contour[3] / 2
+        centers.append((cx, cy))
+
+    return image_orig, sorted_regions, region_distances, centers
 
 def scale_to_range(image):  # skalira elemente slike na opseg od 0 do 1
     ''' Elementi matrice image su vrednosti 0 ili 255.
@@ -414,7 +496,7 @@ def extract_text_from_image(trained_model, image_path, vocabulary):
         # display_image(img_bin)
 
 
-        selected_regions, letters, distances, centers = select_roi(image_color.copy(), img)
+        selected_regions, letters, distances, centers = select_roi_train(image_color.copy(), img)
 
         p0, p1, p2, p3 = cv2.fitLine(np.array(centers), cv2.DIST_L1, 0, 0.1, 0.01)
         temp = cv2.imread(image_path)
@@ -437,8 +519,8 @@ def extract_text_from_image(trained_model, image_path, vocabulary):
         # cv2.line(image_color, (point1X, point1Y), (point2X,point2Y), (0, 255, 0), thickness=15)
         display_image(image_color)
 
-        # if image_path =='.\\dataset\\validation\\train45.png':
-        #     a = 4
+        if image_path =='.\\dataset\\validation\\train20.png':
+            a = 4
 
         (h, w) = image_color.shape[:2]
         center = (w // 2, h // 2)
@@ -446,11 +528,15 @@ def extract_text_from_image(trained_model, image_path, vocabulary):
         newImage = cv2.warpAffine(image_color, M, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
         display_image(newImage)
 
-        img = invert(image_bin(image_gray(newImage)))
-        display_image(img)
 
-        selected_regions, letters, distances, centers = select_roi(newImage.copy(), img)
+        img = invert(image_bin(image_gray(newImage)))
+
+        selected_regions, letters, distances, centers = select_roi_train(newImage.copy(), img)
         display_image(selected_regions)
+
+        # cv2.imshow()
+        # waitkey
+        # cv2.imwrite()
 
         for result in prepare_for_ann(letters):
             inputs.append(result)
@@ -459,7 +545,7 @@ def extract_text_from_image(trained_model, image_path, vocabulary):
         # Podešavanje centara grupa K-means algoritmom
         distances = np.array(distances).reshape(len(distances), 1)
         # Neophodno je da u K-means algoritam bude prosleđena matrica u kojoj vrste određuju elemente
-        k_means = KMeans(n_clusters=2, max_iter=4000, tol=0.00001, n_init=30)
+        k_means = KMeans(n_clusters=2, max_iter=2000, tol=0.00001, n_init=10)
         k_means.fit(distances)
 
         # inputs = prepare_for_ann(letters)
@@ -517,4 +603,5 @@ def extract_text_from_image(trained_model, image_path, vocabulary):
 
 # pokusaj i da sredis
 # i,l jako tesko detektuje
+# tweakuj neuronsku
 # pozadinske slike da resis
