@@ -1,5 +1,7 @@
 # import libraries here
 from __future__ import print_function
+
+
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
@@ -452,9 +454,52 @@ def postprocess(extracted_text, vocabulary):
     for word in text_splits:
         highest = process.extractOne(word, vocabulary_words)
         temp = highest[0]
-        if i > 0:
+        if i > 0 and highest[0] != 'I':
             temp = str.lower(highest[0])
         improved_text = improved_text + temp + " "
+        i = i + 1
+
+    ret = improved_text[:-1]
+
+    return ret
+
+
+# Tj idem for petljom kroz svoje reci
+# Pa unutra for petljkom kroz kljuceve
+# Racunam levenstajna za svaku rec
+# Sve stavljam u novu listu
+# I sortiram po levenstajnu
+# I onda sam nabudzio ono sto mi je rekao ona treca kolona
+# Broj pojavljivanja reci
+# Ako im je isti levenstajn da prednost da reci sa vecim tim brojem
+def postprocess_levenstein(extracted_text, vocabulary):
+    vocabulary_words = vocabulary.keys()
+
+    text_splits = extracted_text.split(" ")
+    improved_text = ""
+    i = 0
+    for word in text_splits:
+        distances = []
+        for key in vocabulary_words:
+            ratio = fuzz.ratio(word, key)
+            distances.append((key, ratio))
+        distances = sorted(distances, key=lambda item: item[1], reverse=True)
+        highest = max(distances,key=lambda item:item[1])
+        highest_levenstein = highest[1]
+
+        final_list = []
+        for j in range(0, 10):
+            if distances[j][1] == highest_levenstein:
+                final_list.append(distances[j][0])
+
+        final_word = ""
+        max_appearance = -1
+        if len(final_list) != 0:
+            for word in final_list:
+                if int(vocabulary[word]) > max_appearance:
+                    final_word = word
+                    max_appearance = int(vocabulary[word])
+        improved_text = improved_text + final_word + " "
         i = i + 1
 
     ret = improved_text[:-1]
@@ -508,7 +553,7 @@ def extract_text_from_image(trained_model, image_path, vocabulary):
 
         angle_in_radians = math.atan(k)
         angle_in_degrees = math.degrees(angle_in_radians)
-        print(angle_in_degrees)
+        # print(angle_in_degrees)
 
         point1X = 0
         point1Y = k * (0 - x0) + y0
@@ -552,9 +597,11 @@ def extract_text_from_image(trained_model, image_path, vocabulary):
         results = trained_model.predict(np.array(inputs, np.float32))
 
         extracted_text = display_result_with_distances(results, alphabet, k_means)
-        print(extracted_text)
+        print('\n' + image_path)
+        print("extracted : " + extracted_text)
 
-        improved_text = postprocess(extracted_text, vocabulary)
+        improved_text = postprocess_levenstein(extracted_text, vocabulary)
+        print("fuzzy improved : " + improved_text)
 
         return improved_text
 
