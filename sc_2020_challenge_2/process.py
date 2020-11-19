@@ -188,7 +188,7 @@ def select_roi_train(image_orig, image_bin):
     for i in range(len(contours)):
         x, y, w, h = cv2.boundingRect(contours[i])  # koordinate i velicina granicnog pravougaonika
         area = cv2.contourArea(contours[i])
-        if w > 5 and h > 25 and hierarchy[0, i, 3] == -1:
+        if w > 5 and h > 10 and hierarchy[0, i, 3] == -1:
             region = image_bin[y:y + h + 1, x:x + w + 1]
             # display_image(region)
             regions_array.append([resize_region(region), (x, y, w, h)])
@@ -529,6 +529,9 @@ def postprocess_levenstein(extracted_text, vocabulary):
 
     return ret
 
+def get_angle(k):
+    angle_in_radians = math.atan(k)
+    return math.degrees(angle_in_radians)
 
 def extract_text_from_image(trained_model, image_path, vocabulary):
     """
@@ -574,9 +577,7 @@ def extract_text_from_image(trained_model, image_path, vocabulary):
         y0 = p3
         k = p1 / p0
 
-        angle_in_radians = math.atan(k)
-        angle_in_degrees = math.degrees(angle_in_radians)
-        # print(angle_in_degrees)
+        angle_in_degrees = get_angle(k)
 
         point1X = 0
         point1Y = k * (0 - x0) + y0
@@ -587,8 +588,8 @@ def extract_text_from_image(trained_model, image_path, vocabulary):
         # cv2.line(image_color, (point1X, point1Y), (point2X,point2Y), (0, 255, 0), thickness=15)
         display_image(image_color)
 
-        if image_path =='.\\dataset\\validation\\train20.png':
-            a = 4
+        # if image_path =='.\\dataset\\validation\\train20.png':
+        #     a = 4
 
         (h, w) = image_color.shape[:2]
         center = (w // 2, h // 2)
@@ -631,7 +632,7 @@ def extract_text_from_image(trained_model, image_path, vocabulary):
     except Exception as e:
         print(e)
 
-        # image_color = load_image(image_path)
+        image_color = load_image(image_path)
         # display_image(image_color)
         # img = invert(image_bin(image_gray(image_color)))
         # display_image(img)
@@ -647,29 +648,79 @@ def extract_text_from_image(trained_model, image_path, vocabulary):
         # # set blue and red channels to 0
         # g[:, :, 0] = 0
         # g[:, :, 2] = 0
-        #
-        # r = image_color.copy()
-        # # set blue and green channels to 0
-        # r[:, :, 0] = 0
-        # r[:, :, 1] = 0
-        #
-        # # RGB - Blue
+
+        alphabet = ['A', 'B', 'C', 'Č', 'Ć', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q',
+                    'R', 'S', 'Š', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'Ž', 'a', 'b', 'c', 'č', 'ć', 'd', 'e',
+                    'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q',
+                    'r', 's', 'š', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'ž']
+
+        r = image_color.copy()
+        # set blue and green channels to 0
+        r[:, :, 0] = 0
+        r[:, :, 1] = 0
+
+        # RGB - Blue
         # plt.imshow(b)
         # plt.show()
         #
         # # RGB - Green
         # plt.imshow(g)
         # plt.show()
-        #
-        # # RGB - Red
-        # plt.imshow(r)
-        # plt.show()
-        #
-        # imf = cv2.cvtColor(image_color, cv2.COLOR_RGB2LAB)
-        # plt.imshow(imf)
-        # plt.show()
 
-        return ""
+        # RGB - Red
+        plt.imshow(r)
+        plt.show()
+
+        # img = invert(image_bin(image_gray(r)))
+        image_bin_adaptive = cv2.threshold(image_gray(r), 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
+        #display_image(image_bin_adaptive)
+        inverted_image = invert(image_bin_adaptive)
+
+        image_color = r.copy()
+        inputs = []
+
+        selected_regions, letters, distances, centers = select_roi_train(image_color.copy(), inverted_image)
+
+        p0, p1, p2, p3 = cv2.fitLine(np.array(centers), cv2.DIST_L1, 0, 0.1, 0.01)
+        temp = cv2.imread(image_path)
+        height, width, channels = temp.shape
+
+        k = p1 / p0
+
+        angle_in_degrees = get_angle(k)
+
+        (h, w) = image_color.shape[:2]
+        center = (w // 2, h // 2)
+        M = cv2.getRotationMatrix2D(center, angle_in_degrees, 1.0)
+        newImage = cv2.warpAffine(image_color, M, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+        display_image(newImage)
+
+        image_bin_adaptive = cv2.threshold(image_gray(newImage), 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
+        inverted_image = invert(image_bin_adaptive)
+        display_image(inverted_image)
+
+        selected_regions, letters, distances, centers = select_roi_train(newImage.copy(), inverted_image)
+        display_image(selected_regions)
+
+
+        for result in prepare_for_ann(letters):
+            inputs.append(result)
+
+        distances = np.array(distances).reshape(len(distances), 1)
+        k_means = KMeans(n_clusters=2, max_iter=2000, tol=0.00001, n_init=10)
+        k_means.fit(distances)
+
+        results = trained_model.predict(np.array(inputs, np.float32))
+
+        extracted_text = display_result_with_distances(results, alphabet, k_means)
+        print('\n' + image_path)
+        print("extracted : " + extracted_text)
+
+        improved_text = postprocess_levenstein(extracted_text, vocabulary)
+        print("fuzzy improved : " + improved_text)
+
+        return improved_text
+
 
 # pokusaj i da sredis
 # i,l jako tesko detektuje
