@@ -41,12 +41,12 @@ def image_bin(image_gs):
     ret, image_bin = cv2.threshold(image_gs, 200, 255, cv2.THRESH_BINARY)
     display_image(image_bin)
 
-    blur = cv2.GaussianBlur(image_gs, (5, 5), 0)
-    display_image(blur)
-    image_bin_adaptive = cv2.threshold(blur,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)[1]
+    # blur = cv2.GaussianBlur(image_gs, (5, 5), 0)
+    # display_image(blur)
+    image_bin_adaptive = cv2.threshold(image_gs,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)[1]
     display_image(image_bin_adaptive)
 
-    return image_bin_adaptive
+    return image_bin
 
 
 def invert(image):
@@ -388,7 +388,6 @@ def load_trained_ann():
         # ako ucitavanje nije uspelo, verovatno model prethodno nije serijalizovan pa nema odakle da bude ucitan
         return None
 
-
 def create_inputs(train_image_paths):
     inputs = []
     for i in range(len(train_image_paths)):
@@ -464,16 +463,40 @@ def postprocess(extracted_text, vocabulary):
     return ret
 
 
-# Tj idem for petljom kroz svoje reci
-# Pa unutra for petljkom kroz kljuceve
-# Racunam levenstajna za svaku rec
-# Sve stavljam u novu listu
-# I sortiram po levenstajnu
-# I onda sam nabudzio ono sto mi je rekao ona treca kolona
-# Broj pojavljivanja reci
-# Ako im je isti levenstajn da prednost da reci sa vecim tim brojem
+def fix_t(extracted_text):
+    text_splits = extracted_text.split(" ")
+    improved_text = ""
+    i = 0
+    for word in text_splits:
+        temp = word
+        if word == 'T':
+            temp = 'I'
+        improved_text = improved_text + temp + " "
+        i = i + 1
+
+    ret = improved_text[:-1]
+    return ret
+
+def make_text_lowercase(extracted_text):
+    text_splits = extracted_text.split(" ")
+    improved_text = ""
+    i = 0
+    for word in text_splits:
+        temp = word
+        if i > 0 and word != 'I':
+            temp = str.lower(word)
+        improved_text = improved_text + temp + " "
+        i = i + 1
+
+    ret = improved_text[:-1]
+    return ret
+
+
 def postprocess_levenstein(extracted_text, vocabulary):
     vocabulary_words = vocabulary.keys()
+
+    extracted_text = fix_t(extracted_text)
+    extracted_text = make_text_lowercase(extracted_text)
 
     text_splits = extracted_text.split(" ")
     improved_text = ""

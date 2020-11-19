@@ -4,10 +4,61 @@
     <list default="true" id="967ac12a-48b3-49b9-bf24-57dfc260edc8" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dataset/validation/annotations.csv" beforeDir="false" afterPath="$PROJECT_DIR$/dataset/validation/annotations.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset/validation/train45.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset/validation/train46.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset/validation/train47.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset/validation/train48.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset/validation/train49.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset/validation/train50.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset/validation/train51.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset/validation/train52.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset/validation/train53.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset/validation/train54.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset/validation/train55.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset/validation/train56.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset/validation/train57.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset/validation/train58.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset/validation/train59.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset/validation/train60.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset/validation/train61.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset/validation/train62.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset/validation/train63.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset/validation/train64.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset/validation/train65.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset/validation/train66.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset/validation/train67.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset/validation/train68.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset/validation/train69.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset/validation/train70.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset/validation/train71.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset/validation/train72.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset/validation/train73.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset/validation/train74.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset/validation/train75.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset/validation/train76.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset/validation/train77.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset/validation/train78.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset/validation/train79.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset/validation/train80.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset/validation/train81.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset/validation/train82.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset/validation/train83.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset/validation/train84.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset/validation/train85.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset/validation/train86.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset/validation/train87.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset/validation/train88.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset/validation/train89.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset/validation/train90.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset/validation/train91.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset/validation/train92.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset/validation/train93.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset/validation/train94.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset/validation/train95.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset/validation/train96.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset/validation/train97.png" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/process.py" beforeDir="false" afterPath="$PROJECT_DIR$/process.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/result.csv" beforeDir="false" afterPath="$PROJECT_DIR$/result.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/serialized_model/neuronska.h5" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/serialized_model/neuronska.json" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -141,7 +192,7 @@
       <workItem from="1605737652276" duration="465000" />
       <workItem from="1605738141697" duration="186000" />
       <workItem from="1605738527247" duration="4401000" />
-      <workItem from="1605786002892" duration="16679000" />
+      <workItem from="1605786002892" duration="18770000" />
     </task>
     <task id="LOCAL-00001" summary="select roi trained, il detection fixed, without letter hooks">
       <created>1605794881192</created>
@@ -196,38 +247,38 @@
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="740" y="303" key="FileChooserDialogImpl/0.0.1920.1080@0.0.1920.1080" timestamp="1605442916702" />
-    <state width="1877" height="297" key="GridCell.Tab.0.bottom" timestamp="1605803921257">
+    <state width="1877" height="297" key="GridCell.Tab.0.bottom" timestamp="1605806326848">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1877" height="297" key="GridCell.Tab.0.bottom/0.0.1920.1080@0.0.1920.1080" timestamp="1605803921257" />
-    <state width="1877" height="297" key="GridCell.Tab.0.center" timestamp="1605803921257">
+    <state width="1877" height="297" key="GridCell.Tab.0.bottom/0.0.1920.1080@0.0.1920.1080" timestamp="1605806326848" />
+    <state width="1877" height="297" key="GridCell.Tab.0.center" timestamp="1605806326848">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1877" height="297" key="GridCell.Tab.0.center/0.0.1920.1080@0.0.1920.1080" timestamp="1605803921257" />
-    <state width="1877" height="297" key="GridCell.Tab.0.left" timestamp="1605803921257">
+    <state width="1877" height="297" key="GridCell.Tab.0.center/0.0.1920.1080@0.0.1920.1080" timestamp="1605806326848" />
+    <state width="1877" height="297" key="GridCell.Tab.0.left" timestamp="1605806326847">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1877" height="297" key="GridCell.Tab.0.left/0.0.1920.1080@0.0.1920.1080" timestamp="1605803921257" />
-    <state width="1877" height="297" key="GridCell.Tab.0.right" timestamp="1605803921257">
+    <state width="1877" height="297" key="GridCell.Tab.0.left/0.0.1920.1080@0.0.1920.1080" timestamp="1605806326847" />
+    <state width="1877" height="297" key="GridCell.Tab.0.right" timestamp="1605806326848">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1877" height="297" key="GridCell.Tab.0.right/0.0.1920.1080@0.0.1920.1080" timestamp="1605803921257" />
-    <state width="1877" height="370" key="GridCell.Tab.1.bottom" timestamp="1605803397606">
+    <state width="1877" height="297" key="GridCell.Tab.0.right/0.0.1920.1080@0.0.1920.1080" timestamp="1605806326848" />
+    <state width="1877" height="370" key="GridCell.Tab.1.bottom" timestamp="1605806175846">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1877" height="370" key="GridCell.Tab.1.bottom/0.0.1920.1080@0.0.1920.1080" timestamp="1605803397606" />
-    <state width="1877" height="370" key="GridCell.Tab.1.center" timestamp="1605803397606">
+    <state width="1877" height="370" key="GridCell.Tab.1.bottom/0.0.1920.1080@0.0.1920.1080" timestamp="1605806175846" />
+    <state width="1877" height="370" key="GridCell.Tab.1.center" timestamp="1605806175846">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1877" height="370" key="GridCell.Tab.1.center/0.0.1920.1080@0.0.1920.1080" timestamp="1605803397606" />
-    <state width="1877" height="370" key="GridCell.Tab.1.left" timestamp="1605803397606">
+    <state width="1877" height="370" key="GridCell.Tab.1.center/0.0.1920.1080@0.0.1920.1080" timestamp="1605806175846" />
+    <state width="1877" height="370" key="GridCell.Tab.1.left" timestamp="1605806175846">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1877" height="370" key="GridCell.Tab.1.left/0.0.1920.1080@0.0.1920.1080" timestamp="1605803397606" />
-    <state width="1877" height="370" key="GridCell.Tab.1.right" timestamp="1605803397606">
+    <state width="1877" height="370" key="GridCell.Tab.1.left/0.0.1920.1080@0.0.1920.1080" timestamp="1605806175846" />
+    <state width="1877" height="370" key="GridCell.Tab.1.right" timestamp="1605806175846">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1877" height="370" key="GridCell.Tab.1.right/0.0.1920.1080@0.0.1920.1080" timestamp="1605803397606" />
+    <state width="1877" height="370" key="GridCell.Tab.1.right/0.0.1920.1080@0.0.1920.1080" timestamp="1605806175846" />
     <state x="461" y="182" key="SettingsEditor" timestamp="1605787836102">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
@@ -249,8 +300,19 @@
     </state>
     <state x="1103" y="235" width="672" height="678" key="search.everywhere.popup/0.0.1920.1080@0.0.1920.1080" timestamp="1605739371205" />
   </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/process.py</url>
+          <line>628</line>
+          <option name="timeStamp" value="55" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/sc_2020_challenge_2$evaluate.coverage" NAME="evaluate Coverage Results" MODIFIED="1605803921247" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/sc_2020_challenge_2$main.coverage" NAME="main Coverage Results" MODIFIED="1605803747098" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/sc_2020_challenge_2$evaluate.coverage" NAME="evaluate Coverage Results" MODIFIED="1605806326837" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/sc_2020_challenge_2$main.coverage" NAME="main Coverage Results" MODIFIED="1605806239881" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
