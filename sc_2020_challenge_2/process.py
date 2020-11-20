@@ -256,6 +256,91 @@ def select_roi_train(image_orig, image_bin):
 
     return image_orig, sorted_regions, region_distances, centers
 
+def select_roi_train_paper(image_orig, image_bin):
+    '''Oznaciti regione od interesa na originalnoj slici. (ROI = regions of interest)
+        Za svaki region napraviti posebnu sliku dimenzija 28 x 28.
+        Za označavanje regiona koristiti metodu cv2.boundingRect(contour).
+        Kao povratnu vrednost vratiti originalnu sliku na kojoj su obeleženi regioni
+        i niz slika koje predstavljaju regione sortirane po rastućoj vrednosti x ose
+    '''
+    # if cancel:
+    #     return None
+
+    img, contours, hierarchy = cv2.findContours(image_bin.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    sorted_regions = []
+    regions_array = []
+    for i in range(1, len(contours)):
+        x, y, w, h = cv2.boundingRect(contours[i])  # koordinate i velicina granicnog pravougaonika
+        area = cv2.contourArea(contours[i])
+        if hierarchy[0,i,3] == -1 and w > 5 and h>10:
+            region = image_bin[y:y + h + 1, x:x + w + 1]
+            # display_image(region)
+            regions_array.append([resize_region(contours[i]), (x, y, w, h)])
+            cv2.rectangle(image_bin, (x, y), (x + w, y + h), (0, 255, 0), 2)
+
+    # sortirati sve regione po x osi (sa leva na desno) i smestiti u promenljivu sorted_regions
+    display_image(image_bin)
+    regions_array = sorted(regions_array, key=lambda item: item[1][0])
+
+    regions_array_filtered = []
+
+    for region in regions_array:
+        x1 = region[1][0]
+        y1 = region[1][1]
+        w1 = region[1][2]
+        h1 = region[1][3]
+        found = False
+        for smaller_region in regions_array:
+            x2 = smaller_region[1][0]
+            y2 = smaller_region[1][1]
+            w2 = smaller_region[1][2]
+            h2 = smaller_region[1][3]
+            if x2 > x1 and x2 + w2 < x1 + w1:
+                found = True
+                x = x1
+                y = y2
+                w = w1
+                h = h1 + h2
+                if not isAlreadyAdded(regions_array_filtered, x):
+                    cutout = image_bin[y:y + h + 1, x:x + w + 1]
+                    regions_array_filtered.append([resize_region(cutout), (x, y, w, h)])
+                    cv2.rectangle(image_orig, (x, y), (x + w, y + h), (255, 0, 0), 2)
+            elif x2 < x1 and x2 + w2 > x1 + w1:
+                found = True
+                x = x2
+                y = y1
+                w = w2
+                h = h1 + h2
+                if not isAlreadyAdded(regions_array_filtered, x):
+                    cutout = image_bin[y:y + h + 1, x:x + w + 1]
+                    regions_array_filtered.append([resize_region(cutout), (x, y, w, h)])
+                    cv2.rectangle(image_orig, (x, y), (x + w, y + h), (255, 0, 0), 2)
+        if not found:
+            cutout = image_bin[y1:y1 + h1 + 1, x1:x1 + w1 + 1]
+            regions_array_filtered.append([resize_region(cutout), (x1, y1, w1, h1)])
+            cv2.rectangle(image_orig, (x1, y1), (x1 + w1, y1 + h1), (0, 255, 0), 2)
+
+    sorted_regions = [region[0] for region in regions_array_filtered]
+
+    sorted_rectangles = [region[1] for region in regions_array_filtered]
+    region_distances = []
+    # Izdvojiti sortirane parametre opisujućih pravougaonika
+    # Izračunati rastojanja između svih susednih regiona po x osi i dodati ih u region_distances niz
+    for index in range(0, len(sorted_rectangles) - 1):
+        current = sorted_rectangles[index]
+        next_rect = sorted_rectangles[index + 1]
+        distance = next_rect[0] - (current[0] + current[2])  # X_next - (X_current + W_current)
+        region_distances.append(distance)
+
+    # computer countour center
+    centers = []
+    for contour in sorted_rectangles:  # x, y, w, h
+        cx = contour[0] + contour[2] / 2
+        cy = contour[1] + contour[3] / 2
+        centers.append((cx, cy))
+
+    return image_orig, sorted_regions, region_distances, centers
+
 def scale_to_range(image):  # skalira elemente slike na opseg od 0 do 1
     ''' Elementi matrice image su vrednosti 0 ili 255.
         Potrebno je skalirati sve elemente matrica na opseg od 0 do 1
@@ -533,6 +618,20 @@ def get_angle(k):
     angle_in_radians = math.atan(k)
     return math.degrees(angle_in_radians)
 
+
+def is_error(extracted_text):
+    text_splits = extracted_text.split(" ")
+    one_word = 0
+    all_words = len(text_splits)
+    for word in text_splits:
+        if len(word) == 1:
+            one_word = one_word + 1
+
+    if one_word/all_words > 0.5:
+        return True
+    return False
+
+
 def extract_text_from_image(trained_model, image_path, vocabulary):
     """
     Procedura prima objekat istreniranog modela za prepoznavanje znakova (karaktera), putanju do fotografije na kojoj
@@ -630,25 +729,11 @@ def extract_text_from_image(trained_model, image_path, vocabulary):
         return improved_text
 
     except Exception as e:
-        try:
+        try: #todo blue background
             print(e)
 
             image_color = load_image(image_path)
-            # display_image(image_color)
-            # img = invert(image_bin(image_gray(image_color)))
-            # display_image(img)
-            # img_bin = erode(dilate(img))
-            # # display_image(img_bin)
-            #
-            # b = image_color.copy()
-            # # set green and red channels to 0
-            # b[:, :, 1] = 0
-            # b[:, :, 2] = 0
-            #
-            # g = image_color.copy()
-            # # set blue and red channels to 0
-            # g[:, :, 0] = 0
-            # g[:, :, 2] = 0
+
 
             alphabet = ['A', 'B', 'C', 'Č', 'Ć', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q',
                         'R', 'S', 'Š', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'Ž', 'a', 'b', 'c', 'č', 'ć', 'd', 'e',
@@ -660,13 +745,6 @@ def extract_text_from_image(trained_model, image_path, vocabulary):
             r[:, :, 0] = 0
             r[:, :, 1] = 0
 
-            # RGB - Blue
-            # plt.imshow(b)
-            # plt.show()
-            #
-            # # RGB - Green
-            # plt.imshow(g)
-            # plt.show()
 
             # RGB - Red
             plt.imshow(r)
@@ -717,14 +795,83 @@ def extract_text_from_image(trained_model, image_path, vocabulary):
             print('\n' + image_path)
             print("extracted : " + extracted_text)
 
+            if is_error(extracted_text):
+                raise Exception
+
             improved_text = postprocess_levenstein(extracted_text, vocabulary)
             print("fuzzy improved : " + improved_text)
 
             return improved_text
 
         except Exception as e:
-            print(e)
-            return ""
+            try:
+                # todo paper background
+                image_color = load_image(image_path)
+                display_image(image_color)
+                img = invert(image_bin(image_gray(image_color)))
+                display_image(img)
+                #img_bin = erode(img)
+                #display_image(img_bin)
+
+
+
+                alphabet = ['A', 'B', 'C', 'Č', 'Ć', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q',
+                            'R', 'S', 'Š', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'Ž', 'a', 'b', 'c', 'č', 'ć', 'd', 'e',
+                            'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q',
+                            'r', 's', 'š', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'ž']
+
+
+                inputs = []
+                img = cv2.copyMakeBorder(img, 20, 20, 20, 20, cv2.BORDER_CONSTANT, value=(255, 255, 255))
+                display_image(img)
+
+                selected_regions, letters, distances, centers = select_roi_train_paper(image_color.copy(), img)
+                display_image(selected_regions)
+
+                p0, p1, p2, p3 = cv2.fitLine(np.array(centers), cv2.DIST_L1, 0, 0.1, 0.01)
+                temp = cv2.imread(image_path)
+                height, width, channels = temp.shape
+
+                k = p1 / p0
+
+                angle_in_degrees = get_angle(k)
+
+                (h, w) = image_color.shape[:2]
+                center = (w // 2, h // 2)
+                M = cv2.getRotationMatrix2D(center, angle_in_degrees, 1.0)
+                newImage = cv2.warpAffine(image_color, M, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+                display_image(newImage)
+
+                img = invert(image_bin(image_gray(newImage)))
+                img_bin = erode(img)
+
+                selected_regions, letters, distances, centers = select_roi_train(newImage.copy(), img_bin)
+                display_image(selected_regions)
+
+                for result in prepare_for_ann(letters):
+                    inputs.append(result)
+
+                distances = np.array(distances).reshape(len(distances), 1)
+                k_means = KMeans(n_clusters=2, max_iter=2000, tol=0.00001, n_init=10)
+                k_means.fit(distances)
+
+                results = trained_model.predict(np.array(inputs, np.float32))
+
+                extracted_text = display_result_with_distances(results, alphabet, k_means)
+                print('\n' + image_path)
+                print("extracted : " + extracted_text)
+
+                if is_error(extracted_text):
+                    raise Exception
+
+                improved_text = postprocess_levenstein(extracted_text, vocabulary)
+                print("fuzzy improved : " + improved_text)
+
+                return improved_text
+
+            except Exception as e:
+                print(e)
+                return ""
 
 
 # pokusaj i da sredis
