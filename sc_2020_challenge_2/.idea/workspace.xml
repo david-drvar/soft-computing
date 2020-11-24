@@ -4,98 +4,6 @@
     <list default="true" id="967ac12a-48b3-49b9-bf24-57dfc260edc8" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dataset/validation/annotations.csv" beforeDir="false" afterPath="$PROJECT_DIR$/dataset/validation/annotations.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train0.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train10.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train11.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train12.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train13.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train14.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train15.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train16.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train17.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train18.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train19.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train2.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train20.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train21.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train22.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train23.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train24.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train25.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train26.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train27.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train28.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train29.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train3.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train30.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train31.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train32.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train33.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train34.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train35.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train36.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train37.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train38.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train39.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train4.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train40.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train41.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train42.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train43.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train44.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train45.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train46.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train47.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train48.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train49.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train5.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train51.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train52.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train53.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train54.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train55.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train56.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train57.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train58.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train6.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train60.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train61.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train62.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train63.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train64.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train65.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train66.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train67.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train68.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train69.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train7.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train70.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train71.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train72.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train73.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train74.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train75.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train76.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train77.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train78.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train79.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train8.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train80.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train82.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train86.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train87.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train88.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train89.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train9.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train90.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train91.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train92.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train93.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train94.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train95.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train96.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/train97.png" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/process.py" beforeDir="false" afterPath="$PROJECT_DIR$/process.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/result.csv" beforeDir="false" afterPath="$PROJECT_DIR$/result.csv" afterDir="false" />
     </list>
@@ -236,7 +144,9 @@
       <workItem from="1605737652276" duration="465000" />
       <workItem from="1605738141697" duration="186000" />
       <workItem from="1605738527247" duration="4401000" />
-      <workItem from="1605786002892" duration="28195000" />
+      <workItem from="1605786002892" duration="29711000" />
+      <workItem from="1606089699131" duration="1169000" />
+      <workItem from="1606245793924" duration="10557000" />
     </task>
     <task id="LOCAL-00001" summary="select roi trained, il detection fixed, without letter hooks">
       <created>1605794881192</created>
@@ -259,6 +169,10 @@
     <option name="LAST_COMMIT_MESSAGE" value="select roi trained, il detection fixed, without letter hooks" />
   </component>
   <component name="WindowStateProjectService">
+    <state x="552" y="198" key="#Images" timestamp="1606249213296">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state x="552" y="198" key="#Images/0.0.1920.1080@0.0.1920.1080" timestamp="1606249213296" />
     <state x="552" y="198" key="#Inspections" timestamp="1605610102629">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
@@ -287,42 +201,42 @@
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state width="1723" height="466" key="DebuggerActiveHint/0.0.1920.1080@0.0.1920.1080" timestamp="1605824547707" />
-    <state x="740" y="303" key="FileChooserDialogImpl" timestamp="1605831414898">
+    <state x="740" y="303" key="FileChooserDialogImpl" timestamp="1606254996124">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state x="740" y="303" key="FileChooserDialogImpl/0.0.1920.1080@0.0.1920.1080" timestamp="1605831414898" />
-    <state width="1877" height="370" key="GridCell.Tab.0.bottom" timestamp="1605832248483">
+    <state x="740" y="303" key="FileChooserDialogImpl/0.0.1920.1080@0.0.1920.1080" timestamp="1606254996124" />
+    <state width="1877" height="370" key="GridCell.Tab.0.bottom" timestamp="1606256734897">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1877" height="370" key="GridCell.Tab.0.bottom/0.0.1920.1080@0.0.1920.1080" timestamp="1605832248483" />
-    <state width="1877" height="370" key="GridCell.Tab.0.center" timestamp="1605832248483">
+    <state width="1877" height="370" key="GridCell.Tab.0.bottom/0.0.1920.1080@0.0.1920.1080" timestamp="1606256734897" />
+    <state width="1877" height="370" key="GridCell.Tab.0.center" timestamp="1606256734897">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1877" height="370" key="GridCell.Tab.0.center/0.0.1920.1080@0.0.1920.1080" timestamp="1605832248483" />
-    <state width="1877" height="370" key="GridCell.Tab.0.left" timestamp="1605832248483">
+    <state width="1877" height="370" key="GridCell.Tab.0.center/0.0.1920.1080@0.0.1920.1080" timestamp="1606256734897" />
+    <state width="1877" height="370" key="GridCell.Tab.0.left" timestamp="1606256734896">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1877" height="370" key="GridCell.Tab.0.left/0.0.1920.1080@0.0.1920.1080" timestamp="1605832248483" />
-    <state width="1877" height="370" key="GridCell.Tab.0.right" timestamp="1605832248483">
+    <state width="1877" height="370" key="GridCell.Tab.0.left/0.0.1920.1080@0.0.1920.1080" timestamp="1606256734896" />
+    <state width="1877" height="370" key="GridCell.Tab.0.right" timestamp="1606256734897">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1877" height="370" key="GridCell.Tab.0.right/0.0.1920.1080@0.0.1920.1080" timestamp="1605832248483" />
-    <state width="1877" height="370" key="GridCell.Tab.1.bottom" timestamp="1605832248483">
+    <state width="1877" height="370" key="GridCell.Tab.0.right/0.0.1920.1080@0.0.1920.1080" timestamp="1606256734897" />
+    <state width="1877" height="370" key="GridCell.Tab.1.bottom" timestamp="1606256734897">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1877" height="370" key="GridCell.Tab.1.bottom/0.0.1920.1080@0.0.1920.1080" timestamp="1605832248483" />
-    <state width="1877" height="370" key="GridCell.Tab.1.center" timestamp="1605832248483">
+    <state width="1877" height="370" key="GridCell.Tab.1.bottom/0.0.1920.1080@0.0.1920.1080" timestamp="1606256734897" />
+    <state width="1877" height="370" key="GridCell.Tab.1.center" timestamp="1606256734897">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1877" height="370" key="GridCell.Tab.1.center/0.0.1920.1080@0.0.1920.1080" timestamp="1605832248483" />
-    <state width="1877" height="370" key="GridCell.Tab.1.left" timestamp="1605832248483">
+    <state width="1877" height="370" key="GridCell.Tab.1.center/0.0.1920.1080@0.0.1920.1080" timestamp="1606256734897" />
+    <state width="1877" height="370" key="GridCell.Tab.1.left" timestamp="1606256734897">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1877" height="370" key="GridCell.Tab.1.left/0.0.1920.1080@0.0.1920.1080" timestamp="1605832248483" />
-    <state width="1877" height="370" key="GridCell.Tab.1.right" timestamp="1605832248483">
+    <state width="1877" height="370" key="GridCell.Tab.1.left/0.0.1920.1080@0.0.1920.1080" timestamp="1606256734897" />
+    <state width="1877" height="370" key="GridCell.Tab.1.right" timestamp="1606256734897">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1877" height="370" key="GridCell.Tab.1.right/0.0.1920.1080@0.0.1920.1080" timestamp="1605832248483" />
+    <state width="1877" height="370" key="GridCell.Tab.1.right/0.0.1920.1080@0.0.1920.1080" timestamp="1606256734897" />
     <state x="461" y="182" key="SettingsEditor" timestamp="1605830632874">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
@@ -349,14 +263,14 @@
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/process.py</url>
-          <line>826</line>
-          <option name="timeStamp" value="97" />
+          <line>958</line>
+          <option name="timeStamp" value="125" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/sc_2020_challenge_2$evaluate.coverage" NAME="evaluate Coverage Results" MODIFIED="1605829175493" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/sc_2020_challenge_2$main.coverage" NAME="main Coverage Results" MODIFIED="1605832129735" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/sc_2020_challenge_2$evaluate.coverage" NAME="evaluate Coverage Results" MODIFIED="1606246978899" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/sc_2020_challenge_2$main.coverage" NAME="main Coverage Results" MODIFIED="1606256663432" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
