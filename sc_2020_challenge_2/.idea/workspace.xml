@@ -2,10 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="967ac12a-48b3-49b9-bf24-57dfc260edc8" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/other.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/other.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset/validation/annotations.csv" beforeDir="false" afterPath="$PROJECT_DIR$/dataset/validation/annotations.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/process.py" beforeDir="false" afterPath="$PROJECT_DIR$/process.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/result.csv" beforeDir="false" afterPath="$PROJECT_DIR$/result.csv" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -50,7 +49,7 @@
       <recent name="C:\Users\david\Desktop\Fax\cetvrta godina\soft kompjuting\soft-computing\sc_2020_challenge_2\dataset\validation" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.main">
+  <component name="RunManager" selected="Python.evaluate">
     <configuration default="true" type="PythonConfigurationType" factoryName="Python">
       <module name="sc_2020_challenge_2" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -146,7 +145,7 @@
       <workItem from="1605738527247" duration="4401000" />
       <workItem from="1605786002892" duration="29711000" />
       <workItem from="1606089699131" duration="1169000" />
-      <workItem from="1606245793924" duration="10557000" />
+      <workItem from="1606245793924" duration="13412000" />
     </task>
     <task id="LOCAL-00001" summary="select roi trained, il detection fixed, without letter hooks">
       <created>1605794881192</created>
@@ -205,42 +204,42 @@
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="740" y="303" key="FileChooserDialogImpl/0.0.1920.1080@0.0.1920.1080" timestamp="1606254996124" />
-    <state width="1877" height="370" key="GridCell.Tab.0.bottom" timestamp="1606256734897">
+    <state width="1877" height="297" key="GridCell.Tab.0.bottom" timestamp="1606259696931">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1877" height="370" key="GridCell.Tab.0.bottom/0.0.1920.1080@0.0.1920.1080" timestamp="1606256734897" />
-    <state width="1877" height="370" key="GridCell.Tab.0.center" timestamp="1606256734897">
+    <state width="1877" height="297" key="GridCell.Tab.0.bottom/0.0.1920.1080@0.0.1920.1080" timestamp="1606259696931" />
+    <state width="1877" height="297" key="GridCell.Tab.0.center" timestamp="1606259696931">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1877" height="370" key="GridCell.Tab.0.center/0.0.1920.1080@0.0.1920.1080" timestamp="1606256734897" />
-    <state width="1877" height="370" key="GridCell.Tab.0.left" timestamp="1606256734896">
+    <state width="1877" height="297" key="GridCell.Tab.0.center/0.0.1920.1080@0.0.1920.1080" timestamp="1606259696931" />
+    <state width="1877" height="297" key="GridCell.Tab.0.left" timestamp="1606259696930">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1877" height="370" key="GridCell.Tab.0.left/0.0.1920.1080@0.0.1920.1080" timestamp="1606256734896" />
-    <state width="1877" height="370" key="GridCell.Tab.0.right" timestamp="1606256734897">
+    <state width="1877" height="297" key="GridCell.Tab.0.left/0.0.1920.1080@0.0.1920.1080" timestamp="1606259696930" />
+    <state width="1877" height="297" key="GridCell.Tab.0.right" timestamp="1606259696931">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1877" height="370" key="GridCell.Tab.0.right/0.0.1920.1080@0.0.1920.1080" timestamp="1606256734897" />
-    <state width="1877" height="370" key="GridCell.Tab.1.bottom" timestamp="1606256734897">
+    <state width="1877" height="297" key="GridCell.Tab.0.right/0.0.1920.1080@0.0.1920.1080" timestamp="1606259696931" />
+    <state width="1877" height="370" key="GridCell.Tab.1.bottom" timestamp="1606259692705">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1877" height="370" key="GridCell.Tab.1.bottom/0.0.1920.1080@0.0.1920.1080" timestamp="1606256734897" />
-    <state width="1877" height="370" key="GridCell.Tab.1.center" timestamp="1606256734897">
+    <state width="1877" height="370" key="GridCell.Tab.1.bottom/0.0.1920.1080@0.0.1920.1080" timestamp="1606259692705" />
+    <state width="1877" height="370" key="GridCell.Tab.1.center" timestamp="1606259692705">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1877" height="370" key="GridCell.Tab.1.center/0.0.1920.1080@0.0.1920.1080" timestamp="1606256734897" />
-    <state width="1877" height="370" key="GridCell.Tab.1.left" timestamp="1606256734897">
+    <state width="1877" height="370" key="GridCell.Tab.1.center/0.0.1920.1080@0.0.1920.1080" timestamp="1606259692705" />
+    <state width="1877" height="370" key="GridCell.Tab.1.left" timestamp="1606259692705">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1877" height="370" key="GridCell.Tab.1.left/0.0.1920.1080@0.0.1920.1080" timestamp="1606256734897" />
-    <state width="1877" height="370" key="GridCell.Tab.1.right" timestamp="1606256734897">
+    <state width="1877" height="370" key="GridCell.Tab.1.left/0.0.1920.1080@0.0.1920.1080" timestamp="1606259692705" />
+    <state width="1877" height="370" key="GridCell.Tab.1.right" timestamp="1606259692705">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state width="1877" height="370" key="GridCell.Tab.1.right/0.0.1920.1080@0.0.1920.1080" timestamp="1606256734897" />
-    <state x="461" y="182" key="SettingsEditor" timestamp="1605830632874">
+    <state width="1877" height="370" key="GridCell.Tab.1.right/0.0.1920.1080@0.0.1920.1080" timestamp="1606259692705" />
+    <state x="461" y="182" key="SettingsEditor" timestamp="1606257476835">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state x="461" y="182" key="SettingsEditor/0.0.1920.1080@0.0.1920.1080" timestamp="1605830632874" />
+    <state x="461" y="182" key="SettingsEditor/0.0.1920.1080@0.0.1920.1080" timestamp="1606257476835" />
     <state x="552" y="261" key="Vcs.Push.Dialog.v2" timestamp="1605794890376">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
@@ -263,14 +262,14 @@
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/process.py</url>
-          <line>958</line>
-          <option name="timeStamp" value="125" />
+          <line>895</line>
+          <option name="timeStamp" value="151" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/sc_2020_challenge_2$evaluate.coverage" NAME="evaluate Coverage Results" MODIFIED="1606246978899" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/sc_2020_challenge_2$main.coverage" NAME="main Coverage Results" MODIFIED="1606256663432" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/sc_2020_challenge_2$evaluate.coverage" NAME="evaluate Coverage Results" MODIFIED="1606259696922" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/sc_2020_challenge_2$main.coverage" NAME="main Coverage Results" MODIFIED="1606259473426" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

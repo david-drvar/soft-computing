@@ -338,9 +338,7 @@ def select_roi_train_paper(image_orig, image_bin):
 
     return image_orig, sorted_regions, region_distances, centers
 
-
-
-def select_roi_train_paper2(image_orig, image_bin):
+def select_roi_train_final_paper(image_orig, image_bin):
     '''Oznaciti regione od interesa na originalnoj slici. (ROI = regions of interest)
         Za svaki region napraviti posebnu sliku dimenzija 28 x 28.
         Za označavanje regiona koristiti metodu cv2.boundingRect(contour).
@@ -349,64 +347,29 @@ def select_roi_train_paper2(image_orig, image_bin):
     '''
     # if cancel:
     #     return None
-
     img, contours, hierarchy = cv2.findContours(image_bin.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    sorted_regions = []
+    sorted_regions = []  # lista sortiranih regiona po x osi (sa leva na desno)
+    dummy = cv2.cvtColor(image_bin.copy(), cv2.COLOR_GRAY2RGB)
     regions_array = []
-    for i in range(0, len(contours)):
+    for i in range(1, len(contours)):
         x, y, w, h = cv2.boundingRect(contours[i])  # koordinate i velicina granicnog pravougaonika
         area = cv2.contourArea(contours[i])
-        if w > 3 and h > 5:
+        if w > 5 and h > 20 and  hierarchy[0, i, 3] == -1 and w<100:
             region = image_bin[y:y + h + 1, x:x + w + 1]
             # display_image(region)
-            regions_array.append([resize_region(contours[i]), (x, y, w, h)])
-            cv2.rectangle(image_bin, (x, y), (x + w, y + h), (0, 255, 0), 2)
+            regions_array.append([resize_region(region), (x, y, w, h)])
+            cv2.rectangle(dummy, (x, y), (x + w, y + h), (255, 0, 0), 2)
 
     # sortirati sve regione po x osi (sa leva na desno) i smestiti u promenljivu sorted_regions
-    display_image(image_bin)
+    display_image(dummy)
     regions_array = sorted(regions_array, key=lambda item: item[1][0])
 
-    regions_array_filtered = []
-    for region in regions_array:
-        x1 = region[1][0]
-        y1 = region[1][1]
-        w1 = region[1][2]
-        h1 = region[1][3]
-        found = False
-        for smaller_region in regions_array:
-            x2 = smaller_region[1][0]
-            y2 = smaller_region[1][1]
-            w2 = smaller_region[1][2]
-            h2 = smaller_region[1][3]
-            if x2 > x1 and x2 + w2 < x1 + w1:
-                found = True
-                x = x1
-                y = y2
-                w = w1
-                h = h1 + h2
-                if not isAlreadyAdded(regions_array_filtered, x):
-                    cutout = image_bin[y:y + h + 1, x:x + w + 1]
-                    regions_array_filtered.append([resize_region(cutout), (x, y, w, h)])
-                    cv2.rectangle(image_orig, (x, y), (x + w, y + h), (255, 0, 0), 2)
-            elif x2 < x1 and x2 + w2 > x1 + w1:
-                found = True
-                x = x2
-                y = y1
-                w = w2
-                h = h1 + h2
-                if not isAlreadyAdded(regions_array_filtered, x):
-                    cutout = image_bin[y:y + h + 1, x:x + w + 1]
-                    regions_array_filtered.append([resize_region(cutout), (x, y, w, h)])
-                    cv2.rectangle(image_orig, (x, y), (x + w, y + h), (255, 0, 0), 2)
-        if not found:
-            cutout = image_bin[y1:y1 + h1 + 1, x1:x1 + w1 + 1]
-            regions_array_filtered.append([resize_region(cutout), (x1, y1, w1, h1)])
-            cv2.rectangle(image_orig, (x1, y1), (x1 + w1, y1 + h1), (0, 255, 0), 2)
 
-    sorted_regions = [region[0] for region in regions_array_filtered]
+    sorted_regions = [region[0] for region in regions_array]
+    sorted_rectangles = [region[1] for region in regions_array]
 
-    sorted_rectangles = [region[1] for region in regions_array_filtered]
     region_distances = []
+
     # Izdvojiti sortirane parametre opisujućih pravougaonika
     # Izračunati rastojanja između svih susednih regiona po x osi i dodati ih u region_distances niz
     for index in range(0, len(sorted_rectangles) - 1):
@@ -422,8 +385,7 @@ def select_roi_train_paper2(image_orig, image_bin):
         cy = contour[1] + contour[3] / 2
         centers.append((cx, cy))
 
-    return image_orig, sorted_regions, region_distances, centers
-
+    return image_bin, sorted_regions, region_distances, centers
 
 def scale_to_range(image):  # skalira elemente slike na opseg od 0 do 1
     ''' Elementi matrice image su vrednosti 0 ili 255.
@@ -779,12 +741,12 @@ def extract_text_from_image(trained_model, image_path, vocabulary):
         center = (w // 2, h // 2)
         M = cv2.getRotationMatrix2D(center, angle_in_degrees, 1.0)
         newImage = cv2.warpAffine(image_color, M, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
-        display_image(newImage)
+        #display_image(newImage)
 
         img = invert(image_bin(image_gray(newImage)))
 
         selected_regions, letters, distances, centers = select_roi_train(newImage.copy(), img)
-        display_image(selected_regions)
+        #display_image(selected_regions)
 
         # cv2.imshow()
         # waitkey
@@ -854,14 +816,14 @@ def extract_text_from_image(trained_model, image_path, vocabulary):
             center = (w // 2, h // 2)
             M = cv2.getRotationMatrix2D(center, angle_in_degrees, 1.0)
             newImage = cv2.warpAffine(image_color, M, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
-            display_image(newImage)
+            #display_image(newImage)
 
             image_bin_adaptive = cv2.threshold(image_gray(newImage), 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
             inverted_image = invert(image_bin_adaptive)
-            display_image(inverted_image)
+            #display_image(inverted_image)
 
             selected_regions, letters, distances, centers = select_roi_train(newImage.copy(), inverted_image)
-            display_image(selected_regions)
+            #display_image(selected_regions)
 
             for result in prepare_for_ann(letters):
                 inputs.append(result)
@@ -883,22 +845,19 @@ def extract_text_from_image(trained_model, image_path, vocabulary):
             print("fuzzy improved : " + improved_text)
 
             return improved_text
+        # light_gray = (229, 193, 248)
+        # dark_black = (214, 181, 232)
         except Exception as e:
             try:
                 # todo paper background
                 image_color = load_image(image_path)
                 display_image(image_color)
                 img = invert(image_bin(image_gray(image_color)))
-                display_image(img)
+                #display_image(img)
                 img_bin = erode(img)
+                img_bin = invert(img_bin)
                 display_image(img_bin)
 
-                light_gray = (174, 174, 176)
-                dark_black = (141, 143, 141)
-                mask = cv2.inRange(image_color, dark_black, light_gray)
-                display_image(mask)
-                # result = cv2.bitwise_and(image_color, image_color, mask=mask)
-                # display_image(result)
 
                 alphabet = ['A', 'B', 'C', 'Č', 'Ć', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
                             'Q',
@@ -907,19 +866,17 @@ def extract_text_from_image(trained_model, image_path, vocabulary):
                             'r', 's', 'š', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'ž']
 
                 inputs = []
-                img = cv2.copyMakeBorder(img, 20, 20, 20, 20, cv2.BORDER_CONSTANT, value=(255, 255, 255))
+                img = cv2.copyMakeBorder(img_bin, 20, 20, 20, 20, cv2.BORDER_CONSTANT, value=(0, 0, 0))
                 image_color = cv2.copyMakeBorder(image_color, 20, 20, 20, 20, cv2.BORDER_CONSTANT, value=(255, 255, 255))
                 display_image(img)
 
-                selected_regions, letters, distances, centers = select_roi_train_paper(image_color.copy(), img.copy())
+                selected_regions, letters, distances, centers = select_roi_train_final_paper(image_color.copy(), img.copy())
                 display_image(selected_regions)
 
                 p0, p1, p2, p3 = cv2.fitLine(np.array(centers), cv2.DIST_L1, 0, 0.1, 0.01)
                 temp = cv2.imread(image_path)
                 height, width, channels = temp.shape
-
                 k = p1 / p0
-
                 angle_in_degrees = get_angle(k)
 
                 (h, w) = image_color.shape[:2]
@@ -929,10 +886,14 @@ def extract_text_from_image(trained_model, image_path, vocabulary):
                 display_image(newImage)
 
                 img = invert(image_bin(image_gray(newImage)))
-                #img_bin = erode(img)
-                #display_image(img_bin)
+                img_bin = erode(img)
+                img_bin = invert(img_bin)
+                display_image(img_bin)
 
-                selected_regions, letters, distances, centers = select_roi_train_paper2(newImage.copy(), img)
+                img = cv2.copyMakeBorder(img_bin, 20, 20, 20, 20, cv2.BORDER_CONSTANT, value=(0, 0, 0))
+                newImage = cv2.copyMakeBorder(newImage, 20, 20, 20, 20, cv2.BORDER_CONSTANT, value=(255, 255, 255))
+
+                selected_regions, letters, distances, centers = select_roi_train_final_paper(newImage.copy(), img)
                 display_image(selected_regions)
 
                 for result in prepare_for_ann(letters):
