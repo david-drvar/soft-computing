@@ -713,6 +713,9 @@ def extract_text_from_image(trained_model, image_path, vocabulary):
         img_bin = erode(dilate(img))
         # display_image(img_bin)
 
+        # if image_path =='.\\dataset\\validation\\train84.png':
+        #     a = 4
+
         selected_regions, letters, distances, centers = select_roi_train(image_color.copy(), img)
 
         p0, p1, p2, p3 = cv2.fitLine(np.array(centers), cv2.DIST_L1, 0, 0.1, 0.01)
@@ -729,13 +732,12 @@ def extract_text_from_image(trained_model, image_path, vocabulary):
         point1Y = k * (0 - x0) + y0
         point2X = width
         point2Y = k * (width - x0) + y0
-        if point1Y > height or point2Y > height:
-            return ""
+        # if point1Y > height or point2Y > height:
+        #     raise Exception
         # cv2.line(image_color, (point1X, point1Y), (point2X,point2Y), (0, 255, 0), thickness=15)
-        display_image(image_color)
+        # display_image(image_color)
 
-        # if image_path =='.\\dataset\\validation\\train20.png':
-        #     a = 4
+
 
         (h, w) = image_color.shape[:2]
         center = (w // 2, h // 2)
@@ -796,6 +798,7 @@ def extract_text_from_image(trained_model, image_path, vocabulary):
 
             # img = invert(image_bin(image_gray(r)))
             image_bin_adaptive = cv2.threshold(image_gray(r), 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
+            #image_bin_adaptive = cv2.threshold(image_gray(r), 0, 215, cv2.THRESH_BINARY+ cv2.THRESH_OTSU)[1]
             # display_image(image_bin_adaptive)
             inverted_image = invert(image_bin_adaptive)
 
@@ -839,7 +842,7 @@ def extract_text_from_image(trained_model, image_path, vocabulary):
             print("extracted : " + extracted_text)
 
             if is_error(extracted_text):
-                raise Exception
+                return ""
 
             improved_text = postprocess_levenstein(extracted_text, vocabulary)
             print("fuzzy improved : " + improved_text)
@@ -873,7 +876,10 @@ def extract_text_from_image(trained_model, image_path, vocabulary):
                 selected_regions, letters, distances, centers = select_roi_train_final_paper(image_color.copy(), img.copy())
                 display_image(selected_regions)
 
-                p0, p1, p2, p3 = cv2.fitLine(np.array(centers), cv2.DIST_L1, 0, 0.1, 0.01)
+                try:
+                    p0, p1, p2, p3 = cv2.fitLine(np.array(centers), cv2.DIST_L1, 0, 0.1, 0.01)
+                except Exception as e:
+                    return ""
                 temp = cv2.imread(image_path)
                 height, width, channels = temp.shape
                 k = p1 / p0
@@ -917,7 +923,7 @@ def extract_text_from_image(trained_model, image_path, vocabulary):
 
                 return improved_text
             except Exception as e:
-                print(e)
+                # print(image_path + "  " + e)
                 return ""
 
 
