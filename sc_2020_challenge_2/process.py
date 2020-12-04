@@ -34,7 +34,7 @@ def image_gray(image):
 def image_bin(image_gs):
     height, width = image_gs.shape[0:2]
     image_binary = np.ndarray((height, width), dtype=np.uint8)
-    ret, image_bin = cv2.threshold(image_gs, 200, 255, cv2.THRESH_BINARY)
+    ret, image_bin = cv2.threshold(image_gs, 207, 255, cv2.THRESH_BINARY)
     display_image(image_bin)
 
     # blur = cv2.GaussianBlur(image_gs, (5, 5), 0)
@@ -59,12 +59,12 @@ def display_image(image, color=False):
 
 
 def dilate(image):
-    kernel = np.ones((3, 3))  # strukturni element 3x3 blok
+    kernel = np.ones((2, 2))  # strukturni element 3x3 blok
     return cv2.dilate(image, kernel, iterations=1)
 
 
 def erode(image):
-    kernel = np.ones((3, 3))  # strukturni element 3x3 blok
+    kernel = np.ones((2, 2))  # strukturni element 3x3 blok
     return cv2.erode(image, kernel, iterations=1)
 
 
@@ -143,7 +143,7 @@ def select_roi(image_orig, image_bin):
                     cutout = image_bin[y:y + h + 1, x:x + w + 1]
                     regions_array_filtered.append([resize_region(cutout), (x, y, w, h)])
                     cv2.rectangle(image_orig, (x, y), (x + w, y + h), (255, 0, 0), 2)
-        if not found and w1 > 20:
+        if not found:
             cutout = image_bin[y1:y1 + h1 + 1, x1:x1 + w1 + 1]
             regions_array_filtered.append([resize_region(cutout), (x1, y1, w1, h1)])
             cv2.rectangle(image_orig, (x1, y1), (x1 + w1, y1 + h1), (0, 255, 0), 2)
