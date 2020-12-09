@@ -5,6 +5,11 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
+from imutils import face_utils
+import argparse
+import imutils
+import dlib
+
 # keras
 from keras.models import Sequential
 from keras.layers.core import Dense, Activation
@@ -23,7 +28,15 @@ from sklearn.cluster import DBSCAN
 import matplotlib.pylab as pylab
 
 
+
+
 def load_image(path):
+
+    # inicijalizaclija dlib detektora (HOG)
+    detector = dlib.get_frontal_face_detector()
+    # ucitavanje pretreniranog modela za prepoznavanje karakteristicnih tacaka
+    predictor = dlib.shape_predictor('shape_predictor_68_face_landmarks.dat')
+
     return cv2.cvtColor(cv2.imread(path), cv2.COLOR_BGR2RGB)
 
 
