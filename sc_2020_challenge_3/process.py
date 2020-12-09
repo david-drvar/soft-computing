@@ -8,12 +8,11 @@ from sklearn import datasets
 from sklearn.cluster import KMeans
 from sklearn.cluster import DBSCAN
 
-
 import os
-from sklearn.svm import SVC # SVM klasifikator
+from sklearn.svm import SVC  # SVM klasifikator
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
-from sklearn.neighbors import KNeighborsClassifier # KNN
+from sklearn.neighbors import KNeighborsClassifier  # KNN
 from joblib import dump, load
 
 import matplotlib
@@ -23,8 +22,13 @@ import argparse
 import imutils
 import dlib
 
+
 def load_image(path):
-    return cv2.cvtColor(cv2.imread(path), cv2.COLOR_BGR2GRAY)
+    img = cv2.cvtColor(cv2.imread(path), cv2.COLOR_BGR2GRAY)
+    return resize_image(img)
+
+def resize_image(image):
+    return cv2.resize(image, (200, 200), interpolation=cv2.INTER_NEAREST)
 
 def display_image(image):
     plt.imshow(image, 'gray')
@@ -34,7 +38,8 @@ def display_image(image):
 # transformisemo u oblik pogodan za scikit-learn
 def reshape_data(input_data):
     nsamples, nx, ny = input_data.shape
-    return input_data.reshape((nsamples, nx*ny))
+    return input_data.reshape((nsamples, nx * ny))
+
 
 def create_hog_descriptor(shape):
     nbins = 9  # broj binova
@@ -51,10 +56,11 @@ def create_hog_descriptor(shape):
 
     return hog
 
-def generate_model(train_image_paths, train_image_labels):
+
+def prepare_model(train_image_paths, train_image_labels):
     images = []
     for path in train_image_paths:
-        images.append(cv2.resize(load_image(path), (200,200), interpolation=cv2.INTER_NEAREST))
+        images.append(load_image(path))
 
     shape = images[0].shape
     hog = create_hog_descriptor(shape)
@@ -66,12 +72,56 @@ def generate_model(train_image_paths, train_image_labels):
     features = reshape_data(np.array(features))
     labels = np.array(train_image_labels)
 
-    #SVM
+    return create_model(features, labels)
+
+
+def create_model(features, labels):
     clf_svm = SVC(kernel='linear', probability=True)
     clf_svm.fit(features, labels)
 
     return clf_svm
 
+
+def prepare_features_dlib(train_image_paths):
+    detector = dlib.get_frontal_face_detector()
+    predictor = dlib.shape_predictor('shape_predictor_68_face_landmarks.dat')
+
+    features = []
+    for image_path in train_image_paths:
+        if image_path == '.\\dataset\\train\\image_12.jpg':
+            # temp = []
+            # temp.append([0,0])
+            # features.append(temp)
+            # continue
+            a = 4
+        gray = load_image(image_path)
+        rects = detector(gray, 1)
+
+        for (i, rect) in enumerate(rects):
+            shape = predictor(gray, rect)
+            shape = face_utils.shape_to_np(shape)
+            features.append(shape)
+
+    return features
+
+
+def prepare_model_dlib(train_image_paths, train_image_labels):
+    features = prepare_features_dlib(train_image_paths)
+
+    features = reshape_data(np.array(features))
+    train_image_labels.pop()
+    labels = np.array(train_image_labels)
+
+    return create_model(features, labels)
+
+def load_model(path):
+    try:
+        return load(path)
+    except Exception as e:
+        return None
+
+def save_model(model, path):
+    dump(model, path)
 
 def train_or_load_age_model(train_image_paths, train_image_labels):
     """
@@ -90,50 +140,12 @@ def train_or_load_age_model(train_image_paths, train_image_labels):
     """
     # TODO - Istrenirati model ako vec nije istreniran, ili ga samo ucitati iz foldera za serijalizaciju
 
-    # # inicijalizaclija dlib detektora (HOG)
-    # detector = dlib.get_frontal_face_detector()
-    # # ucitavanje pretreniranog modela za prepoznavanje karakteristicnih tacaka
-    # predictor = dlib.shape_predictor('shape_predictor_68_face_landmarks.dat')
-    #
-    # for image_path in train_image_paths:
-    #     image = cv2.imread(image_path)
-    #     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    #     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    #
-    #     rects = detector(gray, 1)
-    #
-    #     # iteriramo kroz sve detekcije korak 1.
-    #     for (i, rect) in enumerate(rects):
-    #         # determine the facial landmarks for the face region, then
-    #         # convert the facial landmark (x, y)-coordinates to a NumPy
-    #         # array
-    #         # odredjivanje kljucnih tacaka - korak 2
-    #         shape = predictor(gray, rect)
-    #         # shape predstavlja 68 koordinata
-    #         shape = face_utils.shape_to_np(shape)  # konverzija u NumPy niz
-    #         print("Dimenzije prediktor matrice: {0}".format(shape.shape))  # 68 tacaka (x,y)
-    #         print("Prva 3 elementa matrice")
-    #         print(shape[:3])
-    #
-    #         # konvertovanje pravougaonika u bounding box koorinate
-    #         (x, y, w, h) = face_utils.rect_to_bb(rect)
-    #         # crtanje pravougaonika oko detektovanog lica
-    #         cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
-    #
-    #         # ispis rednog broja detektovanog lica
-    #         cv2.putText(image, "Face #{}".format(i + 1), (x - 10, y - 10),
-    #         cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
-    #
-    #         # crtanje kljucnih tacaka
-    #         for (x, y) in shape:
-    #             cv2.circle(image, (x, y), 1, (0, 0, 255), -1)
-    #
-    #         plt.imshow(image)
-    #         plt.show()
-
-
-    model = generate_model(train_image_paths, train_image_labels)
+    model = load_model('serialization_folder/age_model.joblib')
+    if model == None:
+        model = prepare_model_dlib(train_image_paths, train_image_labels)
+        save_model(model, 'serialization_folder/age_model.joblib')
     return model
+
 
 def train_or_load_gender_model(train_image_paths, train_image_labels):
     """
@@ -152,7 +164,10 @@ def train_or_load_gender_model(train_image_paths, train_image_labels):
     """
     # TODO - Istrenirati model ako vec nije istreniran, ili ga samo ucitati iz foldera za serijalizaciju
 
-    model = generate_model(train_image_paths, train_image_labels)
+    model = load_model('serialization_folder/gender_model.joblib')
+    if model == None:
+        model = prepare_model_dlib(train_image_paths, train_image_labels)
+        save_model(model, 'serialization_folder/gender_model.joblib')
     return model
 
 
@@ -173,7 +188,10 @@ def train_or_load_race_model(train_image_paths, train_image_labels):
     """
     # TODO - Istrenirati model ako vec nije istreniran, ili ga samo ucitati iz foldera za serijalizaciju
 
-    model = generate_model(train_image_paths, train_image_labels)
+    model = load_model('serialization_folder/race_model.joblib')
+    if model == None:
+        model = prepare_model_dlib(train_image_paths, train_image_labels)
+        save_model(model, 'serialization_folder/race_model.joblib')
     return model
 
 
@@ -188,11 +206,18 @@ def predict_age(trained_model, image_path):
     :param image_path: <String> Putanja do fotografije sa koje treba prepoznati godine lica
     :return: <Int> Prediktovanu vrednost za goinde  od 0 do 116
     """
-    age = 0
-    img = cv2.resize(load_image(image_path), (200,200), interpolation=cv2.INTER_NEAREST)
-    hog = create_hog_descriptor(img.shape)
-    age = trained_model.predict(reshape_data(np.array([hog.compute(img)])))
+    # age = 0
+    # img = cv2.resize(load_image(image_path), (200, 200), interpolation=cv2.INTER_NEAREST)
+    # hog = create_hog_descriptor(img.shape)
+    # age = trained_model.predict(reshape_data(np.array([hog.compute(img)])))
+    # return age[0]
+
+    features = prepare_features_dlib([image_path])
+    if features == []:
+        return 0
+    age = trained_model.predict(reshape_data(np.array(features)))
     return age[0]
+
 
 def predict_gender(trained_model, image_path):
     """
@@ -205,12 +230,14 @@ def predict_gender(trained_model, image_path):
     :param image_path: <String> Putanja do fotografije sa koje treba prepoznati ekspresiju lica
     :return: <Int>  Prepoznata klasa pola (0 - musko, 1 - zensko)
     """
-    gender = 1
-    img = cv2.resize(load_image(image_path), (200,200), interpolation=cv2.INTER_NEAREST)
-    hog = create_hog_descriptor(img.shape)
-    gender = trained_model.predict(reshape_data(np.array([hog.compute(img)])))
 
+    features = prepare_features_dlib([image_path])
+    if features == []:
+        return 0
+    gender = trained_model.predict(reshape_data(np.array(features)))
     return gender[0]
+
+
 def predict_race(trained_model, image_path):
     """
     Procedura prima objekat istreniranog modela za prepoznavanje rase lica i putanju do fotografije na kojoj
@@ -222,9 +249,9 @@ def predict_race(trained_model, image_path):
     :param image_path: <String> Putanja do fotografije sa koje treba prepoznati ekspresiju lica
     :return: <Int>  Prepoznata klasa (0 - Bela, 1 - Crna, 2 - Azijati, 3- Indijci, 4 - Ostali)
     """
-    race = 1
-    img = cv2.resize(load_image(image_path), (200, 200), interpolation=cv2.INTER_NEAREST)
-    hog = create_hog_descriptor(img.shape)
-    race = trained_model.predict(reshape_data(np.array([hog.compute(img)])))
 
+    features = prepare_features_dlib([image_path])
+    if features == []:
+        return 0
+    race = trained_model.predict(reshape_data(np.array(features)))
     return race[0]
