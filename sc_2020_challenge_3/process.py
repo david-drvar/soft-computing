@@ -142,7 +142,7 @@ def train_or_load_age_model(train_image_paths, train_image_labels):
 
     model = load_model('serialization_folder/age_model.joblib')
     if model == None:
-        model = prepare_model_dlib(train_image_paths, train_image_labels)
+        model = prepare_model(train_image_paths, train_image_labels)
         save_model(model, 'serialization_folder/age_model.joblib')
     return model
 
@@ -166,7 +166,7 @@ def train_or_load_gender_model(train_image_paths, train_image_labels):
 
     model = load_model('serialization_folder/gender_model.joblib')
     if model == None:
-        model = prepare_model_dlib(train_image_paths, train_image_labels)
+        model = prepare_model(train_image_paths, train_image_labels)
         save_model(model, 'serialization_folder/gender_model.joblib')
     return model
 
@@ -190,7 +190,7 @@ def train_or_load_race_model(train_image_paths, train_image_labels):
 
     model = load_model('serialization_folder/race_model.joblib')
     if model == None:
-        model = prepare_model_dlib(train_image_paths, train_image_labels)
+        model = prepare_model(train_image_paths, train_image_labels)
         save_model(model, 'serialization_folder/race_model.joblib')
     return model
 
@@ -206,17 +206,17 @@ def predict_age(trained_model, image_path):
     :param image_path: <String> Putanja do fotografije sa koje treba prepoznati godine lica
     :return: <Int> Prediktovanu vrednost za goinde  od 0 do 116
     """
-    # age = 0
-    # img = cv2.resize(load_image(image_path), (200, 200), interpolation=cv2.INTER_NEAREST)
-    # hog = create_hog_descriptor(img.shape)
-    # age = trained_model.predict(reshape_data(np.array([hog.compute(img)])))
-    # return age[0]
-
-    features = prepare_features_dlib([image_path])
-    if features == []:
-        return 0
-    age = trained_model.predict(reshape_data(np.array(features)))
+    age = 0
+    img = cv2.resize(load_image(image_path), (200, 200), interpolation=cv2.INTER_NEAREST)
+    hog = create_hog_descriptor(img.shape)
+    age = trained_model.predict(reshape_data(np.array([hog.compute(img)])))
     return age[0]
+
+    # features = prepare_features_dlib([image_path])
+    # if features == []:
+    #     return 0
+    # age = trained_model.predict(reshape_data(np.array(features)))
+    # return age[0]
 
 
 def predict_gender(trained_model, image_path):
@@ -231,11 +231,17 @@ def predict_gender(trained_model, image_path):
     :return: <Int>  Prepoznata klasa pola (0 - musko, 1 - zensko)
     """
 
-    features = prepare_features_dlib([image_path])
-    if features == []:
-        return 0
-    gender = trained_model.predict(reshape_data(np.array(features)))
+    gender = 0
+    img = cv2.resize(load_image(image_path), (200, 200), interpolation=cv2.INTER_NEAREST)
+    hog = create_hog_descriptor(img.shape)
+    gender = trained_model.predict(reshape_data(np.array([hog.compute(img)])))
     return gender[0]
+
+    # features = prepare_features_dlib([image_path])
+    # if features == []:
+    #     return 0
+    # gender = trained_model.predict(reshape_data(np.array(features)))
+    # return gender[0]
 
 
 def predict_race(trained_model, image_path):
@@ -250,8 +256,14 @@ def predict_race(trained_model, image_path):
     :return: <Int>  Prepoznata klasa (0 - Bela, 1 - Crna, 2 - Azijati, 3- Indijci, 4 - Ostali)
     """
 
-    features = prepare_features_dlib([image_path])
-    if features == []:
-        return 0
-    race = trained_model.predict(reshape_data(np.array(features)))
+    race = 0
+    img = cv2.resize(load_image(image_path), (200, 200), interpolation=cv2.INTER_NEAREST)
+    hog = create_hog_descriptor(img.shape)
+    race = trained_model.predict(reshape_data(np.array([hog.compute(img)])))
     return race[0]
+
+    # features = prepare_features_dlib([image_path])
+    # if features == []:
+    #     return 0
+    # race = trained_model.predict(reshape_data(np.array(features)))
+    # return race[0]
