@@ -42,9 +42,9 @@ def reshape_data(input_data):
 
 
 def create_hog_descriptor(shape):
-    nbins = 9  # broj binova
-    cell_size = (8, 8)  # broj piksela po celiji
-    block_size = (3, 3)  # broj celija po bloku
+    nbins = 16  # broj binova 12 - 55%
+    cell_size = (3, 3)  # broj piksela po celiji (3,3) - 55%
+    block_size = (5, 5)  # broj celija po bloku (5,5) - 56%
 
     hog = cv2.HOGDescriptor(_winSize=(shape[1] // cell_size[1] * cell_size[1],
                                       shape[0] // cell_size[0] * cell_size[0]),

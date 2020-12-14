@@ -79,4 +79,9 @@ percentage_age = age_cumsum / len(predicted_age)
 percentage_gender = accuracy_score(truth_gender, predicted_gender) * 100
 percentage_race = accuracy_score(truth_race, predicted_race) * 100
 
+print("age - " + percentage_age.__str__())
+print("gender - " + percentage_gender.__str__())
+print("race - " + percentage_race.__str__())
+
 print(sum([percentage_age, percentage_gender, percentage_race]) / 3)
+
