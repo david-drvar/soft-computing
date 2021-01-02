@@ -6,7 +6,7 @@ import sys
 
 import pyocr
 import pyocr.builders
-
+import numpy as np
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -24,7 +24,6 @@ class Person:
         self.job = job
         self.ssn = ssn
         self.company = company
-
 
 def extract_info(models_folder: str, image_path: str) -> Person:
     """
@@ -55,6 +54,7 @@ def extract_info(models_folder: str, image_path: str) -> Person:
 
     image = cv2.imread(image_path)
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
     plt.imshow(image)
     plt.show()
@@ -80,15 +80,15 @@ def extract_info(models_folder: str, image_path: str) -> Person:
         print()
 
     # todo izlaz lista reči sa tekstom, koordinatama i faktorom sigurnosti
-    # word_boxes = tool.image_to_string(
-    #     Image.fromarray(image),
-    #     lang=lang,
-    #     builder=pyocr.builders.WordBoxBuilder(tesseract_layout=3)
-    # )
-    # for i, box in enumerate(word_boxes):
-    #     print("word %d" % i)
-    #     print(box.content, box.position, box.confidence)
-    #     print()
+    word_boxes = tool.image_to_string(
+        Image.fromarray(image),
+        lang=lang,
+        builder=pyocr.builders.WordBoxBuilder(tesseract_layout=3)
+    )
+    for i, box in enumerate(word_boxes):
+        print("word %d" % i)
+        print(box.content, box.position, box.confidence)
+        print()
 
     # todo detekcija broja
     digits = tool.image_to_string(
@@ -97,4 +97,16 @@ def extract_info(models_folder: str, image_path: str) -> Person:
         builder=pyocr.builders.DigitBuilder(tesseract_layout=3)  # ocekivani text je single line, probati sa 3,4,5..
     )
 
+    # todo rotate image
+
+    canimg = cv2.Canny(gray, 50, 200)
+    lines = cv2.HoughLines(canimg, 1, np.pi / 180.0, 250, np.array([]))
+    rho, theta = lines[0][0]
+
+    (h, w) = image.shape[:2]
+    center = (w // 2, h // 2)
+    M = cv2.getRotationMatrix2D(center, 180*theta/3.1415926-90, 1.0)
+    newImage = cv2.warpAffine(image, M, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+    plt.imshow(newImage)
+    plt.show()
     return person
