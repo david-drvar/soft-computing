@@ -39,9 +39,9 @@ def display_image(image):
 
 
 def create_hog_descriptor(shape):
-    nbins = 15  # broj binova 12 - 55%, 15 - 55.82%
-    cell_size = (3, 3)  # broj piksela po celiji (3,3) - 55%
-    block_size = (6, 6)  # broj celija po bloku (5,5) - 56%
+    nbins = 120  # broj binova 12 - 55%, 15 - 55.82%
+    cell_size = (5, 5)  # broj piksela po celiji (3,3) - 55%
+    block_size = (5, 5)  # broj celija po bloku (5,5) - 56%
 
     hog = cv2.HOGDescriptor(_winSize=(shape[1] // cell_size[1] * cell_size[1],
                                       shape[0] // cell_size[0] * cell_size[0]),
@@ -151,7 +151,7 @@ def prepare_model_dlib_hog_combo(train_image_paths, train_image_labels):
 
 def create_model(features, labels):
     clf_svm = SVC(kernel='linear', probability=True)
-   # features_resampled, labels_resampled = SMOTE().fit_resample(features, labels)
+    #features_resampled, labels_resampled = SMOTE().fit_resample(labels, features)
     clf_svm.fit(features, labels)
 
     return clf_svm
@@ -198,7 +198,7 @@ def save_model(model, path):
 def train_or_load_age_model(train_image_paths, train_image_labels):
     model = load_model('serialization_folder/age_model.joblib')
     if model == None:
-        model = prepare_model(train_image_paths, train_image_labels)
+        model = prepare_model_dlib_hog_combo(train_image_paths, train_image_labels)
         save_model(model, 'serialization_folder/age_model.joblib')
     return model
 
@@ -206,7 +206,7 @@ def train_or_load_age_model(train_image_paths, train_image_labels):
 def train_or_load_gender_model(train_image_paths, train_image_labels):
     model = load_model('serialization_folder/gender_model.joblib')
     if model == None:
-        model = prepare_model(train_image_paths, train_image_labels)
+        model = prepare_model_dlib_hog_combo(train_image_paths, train_image_labels)
         save_model(model, 'serialization_folder/gender_model.joblib')
     return model
 
@@ -214,7 +214,7 @@ def train_or_load_gender_model(train_image_paths, train_image_labels):
 def train_or_load_race_model(train_image_paths, train_image_labels):
     model = load_model('serialization_folder/race_model.joblib')
     if model == None:
-        model = prepare_model(train_image_paths, train_image_labels)
+        model = prepare_model_dlib_hog_combo(train_image_paths, train_image_labels)
         save_model(model, 'serialization_folder/race_model.joblib')
     return model
 
@@ -241,8 +241,8 @@ def predict_age(trained_model, image_path):
     # todo basic hog
     img = cv2.resize(load_image(image_path), (200, 200), interpolation=cv2.INTER_NEAREST)
     hog = create_hog_descriptor(img.shape)
-    gender = trained_model.predict(reshape_data(np.array([hog.compute(img)])))
-    return gender[0]
+    age = trained_model.predict(reshape_data(np.array([hog.compute(img)])))
+    return age[0]
 
     # todo dlib
     # features = prepare_features_dlib([image_path])
