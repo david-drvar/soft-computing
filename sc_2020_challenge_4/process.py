@@ -7,7 +7,6 @@ import sys
 import pyocr
 import pyocr.builders
 
-import pytesseract
 
 import matplotlib
 import matplotlib.pyplot as plt
