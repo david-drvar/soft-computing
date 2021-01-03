@@ -30,36 +30,6 @@ class Person:
         self.company = company
 
 
-def findparallel(lines):
-    parallel_lines = []
-    for line in lines:
-        rho1, theta1 = line[0]
-        a = np.cos(theta1)
-        b = np.sin(theta1)
-        x0 = a * rho1
-        y0 = b * rho1
-        x1 = int(x0 + 1000 * (-b))
-        y1 = int(y0 + 1000 * (a))
-        x2 = int(x0 - 1000 * (-b))
-        y2 = int(y0 - 1000 * (a))
-        angle = np.arctan2(y2 - y1, x2 - x1) * 180.0 / 3.14
-        for line2 in lines:
-            rho2, theta2 = line[0]
-            a = np.cos(theta2)
-            b = np.sin(theta2)
-            x0 = a * rho2
-            y0 = b * rho2
-            x1 = int(x0 + 1000 * (-b))
-            y1 = int(y0 + 1000 * (a))
-            x2 = int(x0 - 1000 * (-b))
-            y2 = int(y0 - 1000 * (a))
-            angle2 = np.arctan2(y2 - y1, x2 - x1) * 180.0 / 3.14
-            if angle == angle2:
-                parallel_lines.append(line2)
-
-    return parallel_lines
-
-
 def findparallel_web(lines):
     lines1 = []
     for i in range(len(lines)):
@@ -73,8 +43,10 @@ def findparallel_web(lines):
 
     return lines1
 
+
 def is_similar(image1, image2):
-    return image1.shape == image2.shape and not(np.bitwise_xor(image1,image2).any())
+    return image1.shape == image2.shape and not (np.bitwise_xor(image1, image2).any())
+
 
 def extract_info(models_folder: str, image_path: str) -> Person:
     """
@@ -117,7 +89,7 @@ def extract_info(models_folder: str, image_path: str) -> Person:
     rho, theta = lines[0][0]
 
     plt.imshow(image)
-    #plt.show()
+    # plt.show()
 
     (h, w) = image.shape[:2]
     center = (w // 2, h // 2)
@@ -187,21 +159,69 @@ def extract_info(models_folder: str, image_path: str) -> Person:
     crop_img = freshNewImage[min_y:max_y, min_x:max_x]
 
     plt.imshow(crop_img)
-    # plt.show()
+    plt.show()
 
-    canimg = cv2.Canny(cv2.cvtColor(crop_img, cv2.COLOR_BGR2GRAY), 50, 200)
+    path = image_path[-11:]
+    full_path = 'cropped/' + path
+    cv2.imwrite(full_path, crop_img)
+
+    canimg = cv2.Canny(cv2.cvtColor(crop_img, cv2.COLOR_BGR2RGB), 50, 200)
     plt.imshow(canimg)
     # plt.show()
 
+    img = cv2.detailEnhance(crop_img, sigma_s=3, sigma_r=0.55)
+    plt.imshow(img)
+    plt.show()
+
     # todo ekstrakcija teksta
-    text = tool.image_to_string(
-        Image.fromarray(canimg),
-        lang=lang,
-        builder=pyocr.builders.TextBuilder(tesseract_layout=3)  # izbor segmentacije (PSM)
+    # text = tool.image_to_string(
+    #     Image.fromarray(img),
+    #     lang=lang,
+    #     builder=pyocr.builders.TextBuilder(tesseract_layout=1)  # izbor segmentacije (PSM)
+    # )
+
+    line_and_word_boxes = tool.image_to_string(
+        Image.fromarray(img), lang=lang,
+        builder=pyocr.builders.LineBoxBuilder(tesseract_layout=3)
     )
 
-    return person
+    for i, line in enumerate(line_and_word_boxes):
+        # print('line %d' % i)
+        print(line.content, line.position, i)
+        # print('boxes')
+        if 'ibm' in line.content.lower():
+            person.company = 'IBM'
+            try:
+                person.name = line_and_word_boxes[2].content
+                person.ssn = line_and_word_boxes[3].content
+                person.job = line_and_word_boxes[4].content[5:]
+            except:
+                return person
+            break
+            # person.date_of_birth = datetime.AnyStr(line_and_word_boxes[5].content)
+        if 'apple' in line.content.lower():
+            person.company = 'Apple'
+            try:
+                person.job = line_and_word_boxes[1].content
+                person.name = line_and_word_boxes[2].content
+                person.ssn = line_and_word_boxes[8].content
+            except:
+                return person
+            break
+        if 'google' in line.content.lower():
+            person.company = 'Google'
+            try:
+                person.name = line_and_word_boxes[9].content
+                person.ssn = line_and_word_boxes[10].content
+                person.job = line_and_word_boxes[11].content
+            except:
+                return person
+            break
+        # for box in line.word_boxes:
+        #     print(box.content, box.position, box.confidence)
+        # print()
 
+    return person
 
     # # todo detekcija broja
     # digits = tool.image_to_string(
@@ -220,7 +240,6 @@ def extract_info(models_folder: str, image_path: str) -> Person:
     #     print("word %d" % i)
     #     print(box.content, box.position, box.confidence)
     #     print()
-
 
     # # todo izlaz po redovima
     # line_and_word_boxes = tool.image_to_string(
