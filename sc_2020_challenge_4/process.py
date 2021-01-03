@@ -29,6 +29,53 @@ class Person:
         self.ssn = ssn
         self.company = company
 
+
+def findparallel(lines):
+    parallel_lines = []
+    for line in lines:
+        rho1, theta1 = line[0]
+        a = np.cos(theta1)
+        b = np.sin(theta1)
+        x0 = a * rho1
+        y0 = b * rho1
+        x1 = int(x0 + 1000 * (-b))
+        y1 = int(y0 + 1000 * (a))
+        x2 = int(x0 - 1000 * (-b))
+        y2 = int(y0 - 1000 * (a))
+        angle = np.arctan2(y2 - y1, x2 - x1) * 180.0 / 3.14
+        for line2 in lines:
+            rho2, theta2 = line[0]
+            a = np.cos(theta2)
+            b = np.sin(theta2)
+            x0 = a * rho2
+            y0 = b * rho2
+            x1 = int(x0 + 1000 * (-b))
+            y1 = int(y0 + 1000 * (a))
+            x2 = int(x0 - 1000 * (-b))
+            y2 = int(y0 - 1000 * (a))
+            angle2 = np.arctan2(y2 - y1, x2 - x1) * 180.0 / 3.14
+            if angle == angle2:
+                parallel_lines.append(line2)
+
+    return parallel_lines
+
+
+def findparallel_web(lines):
+    lines1 = []
+    for i in range(len(lines)):
+        for j in range(len(lines)):
+            if i == j: continue
+            a = lines[i][0][1]
+            b = lines[j][0][1]
+            if abs(lines[i][0][1] - lines[j][0][1]) == 0:
+                # You've found a parallel line!
+                lines1.append(lines[i])
+
+    return lines1
+
+def is_similar(image1, image2):
+    return image1.shape == image2.shape and not(np.bitwise_xor(image1,image2).any())
+
 def extract_info(models_folder: str, image_path: str) -> Person:
     """
     Procedura prima putanju do foldera sa modelima, u slucaju da su oni neophodni, kao i putanju do slike sa koje
@@ -60,58 +107,33 @@ def extract_info(models_folder: str, image_path: str) -> Person:
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
+    original = image.copy()
     plt.imshow(image)
-    #plt.show()
-
-    # text = tool.image_to_string(
-    #     Image.fromarray(image),
-    #     lang=lang,
-    #     builder=pyocr.builders.TextBuilder(tesseract_layout=3)  # izbor segmentacije (PSM)
-    # )
-    #
-    #
-    # # todo izlaz po redovima
-    # line_and_word_boxes = tool.image_to_string(
-    #     Image.fromarray(image), lang=lang,
-    #     builder=pyocr.builders.LineBoxBuilder(tesseract_layout=3)
-    # )
-    # for i, line in enumerate(line_and_word_boxes):
-    #     print('line %d' % i)
-    #     print(line.content, line.position)
-    #     print('boxes')
-    #     for box in line.word_boxes:
-    #         print(box.content, box.position, box.confidence)
-    #     print()
-    #
-    # # todo izlaz lista reči sa tekstom, koordinatama i faktorom sigurnosti
-    # word_boxes = tool.image_to_string(
-    #     Image.fromarray(image),
-    #     lang=lang,
-    #     builder=pyocr.builders.WordBoxBuilder(tesseract_layout=3)
-    # )
-    # for i, box in enumerate(word_boxes):
-    #     print("word %d" % i)
-    #     print(box.content, box.position, box.confidence)
-    #     print()
-    #
-    # # todo detekcija broja
-    # digits = tool.image_to_string(
-    #     Image.fromarray(image),
-    #     lang=lang,
-    #     builder=pyocr.builders.DigitBuilder(tesseract_layout=3)  # ocekivani text je single line, probati sa 3,4,5..
-    # )
+    plt.show()
 
     # todo rotate image
     canimg = cv2.Canny(gray, 50, 200)
-    lines = cv2.HoughLines(canimg, 1, np.pi / 180.0, 250, np.array([]))
+    lines = cv2.HoughLines(canimg, 1, np.pi / 180.0, 200, np.array([]))
     rho, theta = lines[0][0]
+
+    plt.imshow(image)
+    #plt.show()
 
     (h, w) = image.shape[:2]
     center = (w // 2, h // 2)
-    M = cv2.getRotationMatrix2D(center, 180*theta/3.1415926-90, 1.0)
+    M = cv2.getRotationMatrix2D(center, 180 * theta / 3.1415926 - 90, 1.0)
     newImage = cv2.warpAffine(image, M, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
     plt.imshow(newImage)
-    #plt.show()
+    plt.show()
+
+    if is_similar(original, newImage):
+        rho, theta = findparallel_web(lines)[0][0]
+        (h, w) = image.shape[:2]
+        center = (w // 2, h // 2)
+        M = cv2.getRotationMatrix2D(center, 180 * theta / 3.1415926 - 90, 1.0)
+        newImage = cv2.warpAffine(image, M, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+        plt.imshow(newImage)
+        plt.show()
 
     freshNewImage = newImage.copy()
 
@@ -144,7 +166,7 @@ def extract_info(models_folder: str, image_path: str) -> Person:
             max_x = x1
 
     plt.imshow(newImage)
-    #plt.show()
+    # plt.show()
 
     height, width, channels = newImage.shape
 
@@ -165,65 +187,50 @@ def extract_info(models_folder: str, image_path: str) -> Person:
     crop_img = freshNewImage[min_y:max_y, min_x:max_x]
 
     plt.imshow(crop_img)
-    plt.show()
+    # plt.show()
 
-    
+    canimg = cv2.Canny(cv2.cvtColor(crop_img, cv2.COLOR_BGR2GRAY), 50, 200)
+    plt.imshow(canimg)
+    # plt.show()
+
+    # todo ekstrakcija teksta
+    text = tool.image_to_string(
+        Image.fromarray(canimg),
+        lang=lang,
+        builder=pyocr.builders.TextBuilder(tesseract_layout=3)  # izbor segmentacije (PSM)
+    )
+
     return person
 
 
+    # # todo detekcija broja
+    # digits = tool.image_to_string(
+    #     Image.fromarray(image),
+    #     lang=lang,
+    #     builder=pyocr.builders.DigitBuilder(tesseract_layout=3)  # ocekivani text je single line, probati sa 3,4,5..
+    # )
+
+    # # todo izlaz lista reči sa tekstom, koordinatama i faktorom sigurnosti
+    # word_boxes = tool.image_to_string(
+    #     Image.fromarray(image),
+    #     lang=lang,
+    #     builder=pyocr.builders.WordBoxBuilder(tesseract_layout=3)
+    # )
+    # for i, box in enumerate(word_boxes):
+    #     print("word %d" % i)
+    #     print(box.content, box.position, box.confidence)
+    #     print()
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    # todo ekstrakcija kartice
-    # detector = dlib.get_frontal_face_detector()
-    # predictor = dlib.shape_predictor('shape_predictor_68_face_landmarks.dat')
-    #
-    # # detekcija svih lica na grayscale
-    # newGray = cv2.cvtColor(newImage, cv2.COLOR_BGR2GRAY)
-    # rects = detector(newGray, 1)
-
-    # iteriramo kroz sve detekcije korak 1.
-    # for (i, rect) in enumerate(rects):
-    #     shape = predictor(gray, rect)
-    #     shape = face_utils.shape_to_np(shape)
-    #     print("Dimenzije prediktor matrice: {0}".format(shape.shape))
-    #     print("Prva 3 elementa matrice")
-    #     print(shape[:3])
-    #
-    #     (x, y, w, h) = face_utils.rect_to_bb(rect)
-    #     cv2.rectangle(newImage, (x, y), (x + w, y + h), (0, 255, 0), 2)
-    #
-    #     # ispis rednog broja detektovanog lica
-    #     # cv2.putText(image, "Face #{}".format(i + 1), (x - 10, y - 10),
-    #     #             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
-    #
-    #     # crtanje kljucnih tacaka
-    #     # for (x, y) in shape:
-    #     #     cv2.circle(image, (x, y), 1, (0, 0, 255), -1)
-    #
-    # plt.imshow(newImage)
-    # plt.show()
+    # # todo izlaz po redovima
+    # line_and_word_boxes = tool.image_to_string(
+    #     Image.fromarray(image), lang=lang,
+    #     builder=pyocr.builders.LineBoxBuilder(tesseract_layout=3)
+    # )
+    # for i, line in enumerate(line_and_word_boxes):
+    #     print('line %d' % i)
+    #     print(line.content, line.position)
+    #     print('boxes')
+    #     for box in line.word_boxes:
+    #         print(box.content, box.position, box.confidence)
+    #     print()
